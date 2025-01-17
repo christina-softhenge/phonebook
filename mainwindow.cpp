@@ -1,49 +1,44 @@
 #include "mainwindow.h"
 
 #include <QFile>
-#include <QTimer>
-#include <QTextStream>
-#include <QDebug>
-#include <QTreeView>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QFileSystemWatcher>
+#include <QDir>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , filePath("/home/kristina/Qt_projects/phonebook_mv/phonebook.txt")
-    , treeView(new QTreeView(this))
-    , standardModel(new QStandardItemModel(this))
-    , rootNode(standardModel->invisibleRootItem())
-    , watcher(new QFileSystemWatcher(this))
+    , m_filePath(QDir::homePath() + "/phonebook.txt")
+    , m_treeView(new QTreeView(this))
+    , m_standardModel(new QStandardItemModel(this))
+    , m_rootNode(m_standardModel->invisibleRootItem())
+    , m_watcher(new QFileSystemWatcher(this))
 {
-    setCentralWidget(treeView);
+    setCentralWidget(m_treeView);
     resize(600,500);
-
     initModel();
 
-    getDataFromFile(filePath);
+    getDataFromFile(m_filePath);
 
-    watcher->addPath(filePath);
-    connect(watcher,&QFileSystemWatcher::fileChanged, this, &MainWindow::onFileChanged);
-    connect(treeView, &QTreeView::doubleClicked, this, &MainWindow::onDoubleClick);
-    for (int col = 0; col < standardModel->columnCount(); ++col) {
-        treeView->resizeColumnToContents(col);
+    m_watcher->addPath(m_filePath);
+    connect(m_watcher,&QFileSystemWatcher::fileChanged, this, &MainWindow::onFileChanged);
+    connect(m_treeView, &QTreeView::doubleClicked, this, &MainWindow::onDoubleClick);
+    for (int col = 0; col < m_standardModel->columnCount(); ++col) {
+        m_treeView->resizeColumnToContents(col);
     }
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{ }
+
+void MainWindow::initModel()
+{
+    m_standardModel->setColumnCount(3);
+    m_standardModel->setHorizontalHeaderLabels({"Phone", "Date of birth", "Email"});
+    m_treeView->setModel(m_standardModel);
+    m_treeView->expandAll();
+    m_treeView->setHeaderHidden(false);
 }
 
-void MainWindow::initModel() {
-    standardModel->setColumnCount(3);
-    standardModel->setHorizontalHeaderLabels({"Phone", "Date of birth", "Email"});
-    treeView->setModel(standardModel);
-    treeView->expandAll();
-    treeView->setHeaderHidden(false);
-}
-
-void MainWindow::getDataFromFile(const QString& path) {
+void MainWindow::getDataFromFile(const QString& path)
+{
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "Unable to open file";
@@ -51,17 +46,19 @@ void MainWindow::getDataFromFile(const QString& path) {
     }
 
     QTextStream fileStream(&file);
-    rootNode->removeRows(0, rootNode->rowCount());
+    m_rootNode->removeRows(0, m_rootNode->rowCount());
     while (!fileStream.atEnd()) {
         QString line = fileStream.readLine();
         QStringList list = line.split(QRegularExpression("[,\\s]+"));
+        if (list.size() != 4) {
+            throw std::length_error("List size is not appropriate");
+        }
         QStandardItem* item = new QStandardItem(list[0]);
         auto row = prepareRow(list[1], list[2], list[3]);
-        rootNode->appendRow(item);
+        m_rootNode->appendRow(item);
         item->appendRow(row);
     }
     file.close();
-    treeView->expandAll();
 }
 
 
@@ -70,23 +67,25 @@ QList<QStandardItem *> MainWindow::prepareRow(const QString &first, const QStrin
     return {new QStandardItem(first), new QStandardItem(second), new QStandardItem(third)};
 }
 
-void MainWindow::onFileChanged(const QString &path) {
+void MainWindow::onFileChanged(const QString &path)
+{
     getDataFromFile(path);
-    if (watcher->files().empty()) {
-        watcher->addPath(path);
+    if (m_watcher->files().empty()) {
+        m_watcher->addPath(path);
     }
 }
 
-void MainWindow::onDoubleClick(const QModelIndex &index) {
-    standardModel->removeRow(index.row());
-    QFile file(filePath);
+void MainWindow::onDoubleClick(const QModelIndex &index)
+{
+    m_standardModel->removeRow(index.row());
+    QFile file(m_filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qWarning() << "Unable to open file";
         return;
     }
     QTextStream out(&file);
-    for (int row = 0; row < standardModel->rowCount(); ++row) {
-        QStandardItem* nameItem = standardModel->item(row);
+    for (int row = 0; row < m_standardModel->rowCount(); ++row) {
+        QStandardItem* nameItem = m_standardModel->item(row);
         if (nameItem) {
             QStandardItem* phoneItem = nameItem->child(0,0);
             QStandardItem* dateItem = nameItem->child(0,1);

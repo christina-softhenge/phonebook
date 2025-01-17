@@ -23,11 +23,11 @@ private:
     void onFileChanged(const QString &path);
     void onDoubleClick(const QModelIndex &index);
 private:
-    QString filePath;
-    QTreeView* treeView;
-    QStandardItemModel* standardModel;
-    QStandardItem *rootNode;
-    QFileSystemWatcher* watcher;
+    QString m_filePath;
+    QTreeView *m_treeView;
+    QStandardItemModel *m_standardModel;
+    QStandardItem *m_rootNode;
+    QFileSystemWatcher *m_watcher;
 };
 
 #endif // MAINWINDOW_H
