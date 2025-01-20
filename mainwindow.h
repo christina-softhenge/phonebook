@@ -5,6 +5,7 @@
 #include <QTreeView>
 #include <QStandardItemModel>
 #include <QFileSystemWatcher>
+#include <QFileDialog>
 
 class MainWindow : public QMainWindow
 {
@@ -23,11 +24,12 @@ private:
     void onFileChanged(const QString &path);
     void onDoubleClick(const QModelIndex &index);
 private:
-    QString m_filePath;
     QTreeView *m_treeView;
     QStandardItemModel *m_standardModel;
     QStandardItem *m_rootNode;
     QFileSystemWatcher *m_watcher;
+    QFileDialog *m_fileDialog;
+    QString m_filePath;
 };
 
 #endif // MAINWINDOW_H

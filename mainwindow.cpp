@@ -5,16 +5,17 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , m_filePath(QDir::homePath() + "/phonebook.txt")
     , m_treeView(new QTreeView(this))
     , m_standardModel(new QStandardItemModel(this))
     , m_rootNode(m_standardModel->invisibleRootItem())
     , m_watcher(new QFileSystemWatcher(this))
+    , m_fileDialog(new QFileDialog(this))
+    , m_filePath(m_fileDialog->getOpenFileName(this, "Select Data Source File", "", "Text Files (*.txt);;All Files (*)"))
 {
     setCentralWidget(m_treeView);
     resize(600,500);
-    initModel();
 
+    initModel();
     getDataFromFile(m_filePath);
 
     m_watcher->addPath(m_filePath);
@@ -33,7 +34,6 @@ void MainWindow::initModel()
     m_standardModel->setColumnCount(3);
     m_standardModel->setHorizontalHeaderLabels({"Phone", "Date of birth", "Email"});
     m_treeView->setModel(m_standardModel);
-    m_treeView->expandAll();
     m_treeView->setHeaderHidden(false);
 }
 
@@ -58,6 +58,7 @@ void MainWindow::getDataFromFile(const QString& path)
         m_rootNode->appendRow(item);
         item->appendRow(row);
     }
+    m_treeView->expandAll();
     file.close();
 }
 
