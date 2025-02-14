@@ -3,38 +3,46 @@ import QtQuick
 Rectangle {
     implicitWidth: 150
     implicitHeight: 25
-
     property alias text: input.text
+
+
+    onHeightChanged: {
+        console.log("height", height, implicitHeight, width, implicitWidth)
+    }
+
     Flickable {
         id: flick
-        topMargin: 4;
-        leftMargin: 2;
+        topMargin: 4
+        leftMargin: 2
         anchors.fill: parent
         contentWidth: input.contentWidth
         contentHeight: input.contentHeight
         clip: true
 
-        function ensureVisible(r)
+        function ensureVisible(rect)
         {
-            if (contentX >= r.x)
-                contentX = r.x;
-            else if (contentX+width <= r.x+r.width)
-                contentX = r.x+r.width-width;
-            if (contentY >= r.y)
-                contentY = r.y;
-            else if (contentY+height <= r.y+r.height)
-                contentY = r.y+r.height-height;
+            if (contentX >= rect.x)
+                contentX = rect.x
+            else if (contentX + width <= rect.x + rect.width)
+                contentX = rect.x + rect.width - width
+            if (contentY >= rect.y)
+                contentY = rect.y
+            else if (contentY + height <= rect.y + rect.height)
+                contentY = rect.y + rect.height - height
         }
 
         TextInput {
             id: input
-            leftPadding: 5;
+            leftPadding: 5
             anchors.fill: parent
+            activeFocusOnPress: true
             onCursorRectangleChanged: flick.ensureVisible(cursorRectangle)
         }
-
-        TapHandler {
-            onTapped: input.focus = true
+    }
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            input.forceActiveFocus()
         }
     }
 }
