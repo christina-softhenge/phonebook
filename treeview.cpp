@@ -3,34 +3,18 @@
 #include <QFile>
 #include <QDir>
 
-TreeView::TreeView(QWidget *parent)
-    : QWidget(parent)
-    , m_treeView(new QTreeView(this))
+TreeView::TreeView(QObject *parent)
+    : QObject(parent)
     , m_standardModel(new QStandardItemModel(this))
     , m_rootNode(m_standardModel->invisibleRootItem())
     , m_watcher(new QFileSystemWatcher(this))
-    , m_fileDialog(new QFileDialog(this))
-    , m_filePath(m_fileDialog->getOpenFileName(this, "Select Data Source File", "", "Text Files (*.txt);;All Files (*)"))
 {
-    resize(600,500);
-
-    initModel();
-    getDataFromFile(m_filePath);
-
-    m_watcher->addPath(m_filePath);
-    connect(m_watcher,&QFileSystemWatcher::fileChanged, this, &TreeView::onFileChanged);
-    connect(m_treeView, &QTreeView::doubleClicked, this, &TreeView::onDoubleClick);
-    for (int col = 0; col < m_standardModel->columnCount(); ++col) {
-        m_treeView->resizeColumnToContents(col);
-    }
-    emit modelChanged();
 }
 
 TreeView::~TreeView()
 { }
 
 Q_INVOKABLE void TreeView::addContact(const QString& name,const QString& phone,const QString& birthDate,const QString& email) {
-    qDebug() << name << "\n";
     QStandardItem* item = new QStandardItem(name);
 
     auto row = prepareRow(phone, birthDate, email);
@@ -38,12 +22,6 @@ Q_INVOKABLE void TreeView::addContact(const QString& name,const QString& phone,c
     m_rootNode->appendRow(item);
     item->appendColumn(row);
     emit modelChanged();
-}
-
-void TreeView::initModel()
-{
-    m_treeView->setModel(m_standardModel);
-    m_treeView->setHeaderHidden(false);
 }
 
 void TreeView::getDataFromFile(const QString& path)
@@ -71,7 +49,6 @@ void TreeView::getDataFromFile(const QString& path)
         m_rootNode->appendRow(item);
         item->appendColumn(row);
     }
-    m_treeView->expandAll();
     file.close();
 }
 
@@ -103,16 +80,12 @@ void TreeView::onDoubleClick(const QModelIndex &index)
         if (nameItem) {
             QStandardItem* phoneItem = nameItem->child(0,0);
             QStandardItem* dateItem = nameItem->child(1,0);
-            if (!phoneItem) {
-                qDebug() << "Valodik";
-            }
             QStandardItem* emailItem = nameItem->child(2,0);
             out << nameItem->text() << ", " << phoneItem->text() << ", " << dateItem->text() << ", " << emailItem->text() << '\n';
         } else {
             qDebug() << "empty";
         }
     }
-    qDebug() << "Valodik2";
     emit modelChanged();
     file.close();
 }

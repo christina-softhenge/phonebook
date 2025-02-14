@@ -7,17 +7,27 @@
 #include <QFileSystemWatcher>
 #include <QFileDialog>
 
-class TreeView : public QWidget
+class TreeView : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QAbstractItemModel* model READ getModel NOTIFY modelChanged)
 public:
-    TreeView(QWidget *parent = nullptr);
+    TreeView(QObject *parent = nullptr);
     ~TreeView();
 
     void getDataFromFile(const QString &path);
-    void initModel();
 
+    Q_INVOKABLE void setPath(QString path) {
+        if (path.startsWith("file://")) {
+            path.remove(0, 7);
+        }
+        m_filePath = path;
+        getDataFromFile(m_filePath);
+
+        m_watcher->addPath(m_filePath);
+        connect(m_watcher,&QFileSystemWatcher::fileChanged, this, &TreeView::onFileChanged);
+        emit modelChanged();
+    }
     Q_INVOKABLE QAbstractItemModel* getModel() const { return m_standardModel; }
     Q_INVOKABLE void addContact(const QString& name,const QString& phone,const QString& birthDate,const QString& email);
     Q_INVOKABLE void onItemDoubleClicked(int row, int column) {
@@ -35,11 +45,9 @@ private:
 signals:
     void modelChanged();
 private:
-    QTreeView *m_treeView;
     QStandardItemModel *m_standardModel;
     QStandardItem *m_rootNode;
     QFileSystemWatcher *m_watcher;
-    QFileDialog *m_fileDialog;
     QString m_filePath;
 };
 
