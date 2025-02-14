@@ -29,13 +29,21 @@ TreeView::TreeView(QWidget *parent)
 TreeView::~TreeView()
 { }
 
+Q_INVOKABLE void TreeView::addContact(const QString& name,const QString& phone,const QString& birthDate,const QString& email) {
+    qDebug() << name << "\n";
+    QStandardItem* item = new QStandardItem(name);
+
+    auto row = prepareRow(phone, birthDate, email);
+
+    m_rootNode->appendRow(item);
+    item->appendColumn(row);
+    emit modelChanged();
+}
+
 void TreeView::initModel()
 {
-    // m_standardModel->setColumnCount(3);
-    // m_standardModel->setHorizontalHeaderLabels({"Phone", "Date of birth", "Email"});
     m_treeView->setModel(m_standardModel);
     m_treeView->setHeaderHidden(false);
-
 }
 
 void TreeView::getDataFromFile(const QString& path)
@@ -59,9 +67,6 @@ void TreeView::getDataFromFile(const QString& path)
         QStandardItem* item = new QStandardItem(list[0]);
 
         auto row = prepareRow(list[1], list[2], list[3]);
-        row[0]->setData(list[1]);
-        row[1]->setData(list[2]);
-        row[2]->setData(list[3]);
 
         m_rootNode->appendRow(item);
         item->appendColumn(row);

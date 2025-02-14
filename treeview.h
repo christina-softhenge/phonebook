@@ -19,6 +19,7 @@ public:
     void initModel();
 
     Q_INVOKABLE QAbstractItemModel* getModel() const { return m_standardModel; }
+    Q_INVOKABLE void addContact(const QString& name,const QString& phone,const QString& birthDate,const QString& email);
     Q_INVOKABLE void onItemDoubleClicked(int row, int column) {
         QModelIndex index = m_standardModel->index(row,column);
         onDoubleClick(index);
