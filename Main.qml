@@ -63,18 +63,5 @@ ApplicationWindow {
     }
     minimumWidth: rowLayout.implicitWidth
     minimumHeight: rowLayout.implicitHeight
-    FileDialog {
-        id: fileDialog
-        title: "Please choose a file"
-        currentFolder: StandardPaths.standardLocations(StandardPaths.HomeLocation)[0]
-        nameFilters: ["Text files (*.txt)"]
-        onAccepted: {
-            treeViewProperty.setPath(fileDialog.selectedFiles)
-        }
-        onRejected: {
-            console.log("Canceled")
-        }
-        Component.onCompleted: visible = true
-    }
 }
 
