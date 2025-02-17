@@ -17,6 +17,7 @@ Popup {
         phone.border.color = "black"
         birthDate.border.color = "black"
         email.border.color = "black"
+        warningText.text = ""
     }
 
     Rectangle {
@@ -29,8 +30,7 @@ Popup {
            anchors.leftMargin: 20
             GridLayout {
                 id: gridlay
-                columns:2
-                anchors.margins: 20
+                columns: 2
                 Text {
                     text: "name:"
                 }
@@ -71,40 +71,48 @@ Popup {
                     color: "red"
                 }
             }
-            Button {
-                implicitHeight: 25
-                text: "save"
-                onClicked: {
-                    let phoneRegex = /^\d+$/
-                    let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-                    let nameRegex = /^[a-zA-Z\s]+$/;  // Matches only alphabets and spaces for name
-                    let birthdateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/
+            RowLayout {
+                id: rowLayout
+                Button {
+                    implicitHeight: 25
+                    text: "save"
+                    onClicked: {
+                        let phoneRegex = /^\d+$/
+                        let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+                        let nameRegex = /^[a-zA-Z\s]+$/;  // Matches only alphabets and spaces for name
+                        let birthdateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/
 
-                    function validateInput(field, regex, element) {
-                        if (!regex.test(field)) {
-                            element.border.color = "red"
-                            return false;
+                        function validateInput(field, regex, element) {
+                            if (!regex.test(field)) {
+                                element.border.color = "red"
+                                return false;
+                            } else {
+                                element.border.color = "black"
+                                return true;
+                            }
+                        }
+                        warningText.text = ""
+
+                        let isValid = true
+                        isValid &= validateInput(name.text, nameRegex, name)
+                        isValid &= validateInput(phone.text, phoneRegex, phone)
+                        isValid &= validateInput(birthDate.text, birthdateRegex, birthDate)
+                        isValid &= validateInput(email.text, emailRegex, email)
+
+                        if (isValid) {
+                            treeViewProperty.addContact(name.text, phone.text, birthDate.text, email.text)
+                            addContactWindow.close()
                         } else {
-                            element.border.color = "black"
-                            return true;
+                            if (warningText.text === "") {
+                                warningText.text = "Invalid argument."
+                            }
                         }
                     }
-                    warningText.text = ""
-
-                    let isValid = true
-                    isValid &= validateInput(name.text, nameRegex, name)
-                    isValid &= validateInput(phone.text, phoneRegex, phone)
-                    isValid &= validateInput(birthDate.text, birthdateRegex, birthDate)
-                    isValid &= validateInput(email.text, emailRegex, email)
-
-                    if (isValid) {
-                        treeViewProperty.addContact(name.text, phone.text, birthDate.text, email.text)
-                        addContactWindow.close()
-                    } else {
-                        if (warningText.text === "") {
-                            warningText.text = "Invalid argument."
-                        }
-                    }
+                }
+                Button {
+                    implicitHeight: 25
+                    text: "cancel"
+                    onClicked: addContactWindow.close()
                 }
             }
         }
