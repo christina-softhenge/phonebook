@@ -6,6 +6,8 @@
 #include <QStandardItemModel>
 #include <QFileSystemWatcher>
 #include <QFileDialog>
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
 
 class TreeView : public QObject
 {
@@ -15,19 +17,8 @@ public:
     TreeView(QObject *parent = nullptr);
     ~TreeView();
 
-    void getDataFromFile(const QString &path);
+    void getDataFromFile();
 
-    Q_INVOKABLE void setPath(QString path) {
-        if (path.startsWith("file://")) {
-            path.remove(0, 7);
-        }
-        m_filePath = path;
-        getDataFromFile(m_filePath);
-
-        m_watcher->addPath(m_filePath);
-        connect(m_watcher,&QFileSystemWatcher::fileChanged, this, &TreeView::onFileChanged);
-        emit modelChanged();
-    }
     Q_INVOKABLE QAbstractItemModel* getModel() const { return m_standardModel; }
     Q_INVOKABLE void addContact(const QString& name,const QString& phone,const QString& birthDate,const QString& email);
     Q_INVOKABLE void onItemDoubleClicked(int row, int column) {
@@ -39,7 +30,6 @@ private:
     QList<QStandardItem *> prepareRow(const QString &first, const QString &second, const QString &third) const;
 
     //slots
-    void onFileChanged(const QString &path);
     void onDoubleClick(const QModelIndex &index);
 
 signals:
