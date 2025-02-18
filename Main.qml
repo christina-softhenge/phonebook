@@ -21,7 +21,7 @@ ApplicationWindow {
             id: treeView
             Layout.fillWidth: true
             Layout.fillHeight: true
-            model: treeViewProperty.getModel()
+            model: treeViewProperty.model
 
             delegate: TreeViewDelegate {
                 indentation: 20
@@ -43,23 +43,45 @@ ApplicationWindow {
                 }
             }
         }
-        AddContactWindow {
-            id: addContactPopup
-        }
-
-        Button {
-            text: "New contact"
+        ColumnLayout {
+            id: columnLay
             Layout.alignment: Qt.AlignTop | Qt.AlignRight
-            implicitWidth: 100
-            implicitHeight: 50
-            background: Rectangle {
-                color: "lightblue"
-                radius: 10
+            Button {
+                id: newContactButton
+                text: "New contact"
+                implicitWidth: 100
+                implicitHeight: 50
+                background: Rectangle {
+                    color: "lightblue"
+                    radius: 10
+                }
+                onClicked: {
+                    addContactPopup.open()
+                }
             }
-            onClicked: {
-                addContactPopup.open()
+
+            CustomTextEdit {
+                id: filterEdit
+                border.color: "black"
+            }
+
+            Button {
+                id: filterButton
+                text: "Filter"
+                implicitWidth: 100
+                implicitHeight: 50
+                background: Rectangle {
+                    color: "lightblue"
+                    radius: 10
+                }
+                onClicked: {
+                    treeViewProperty.filterWithKey(filterEdit.text)
+                }
             }
         }
+    }
+    AddContactWindow {
+        id: addContactPopup
     }
     minimumWidth: rowLayout.implicitWidth
     minimumHeight: rowLayout.implicitHeight
