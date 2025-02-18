@@ -1,10 +1,10 @@
-#include "treeview.h"
+#include "storagecontroller.h"
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
 #include <QDate>
 
-TreeView::TreeView(QObject *parent)
+StorageController::StorageController(QObject *parent)
     : QObject(parent)
     , m_standardModel(new QStandardItemModel(this))
     , m_rootNode(m_standardModel->invisibleRootItem())
@@ -13,10 +13,10 @@ TreeView::TreeView(QObject *parent)
     getDataFromDB();
 }
 
-TreeView::~TreeView()
+StorageController::~StorageController()
 { }
 
-Q_INVOKABLE void TreeView::addContact(const QString& name,const QString& phone,const QString& birthDate,const QString& email) {
+Q_INVOKABLE void StorageController::addContact(const QString& name,const QString& phone,const QString& birthDate,const QString& email) {
     QStringList dateParts = birthDate.split('/');
     QDate birthdate(dateParts[2].toInt(),dateParts[1].toInt(),dateParts[0].toInt());
 
@@ -27,12 +27,12 @@ Q_INVOKABLE void TreeView::addContact(const QString& name,const QString& phone,c
     item->appendColumn(row);
 }
 
-Q_INVOKABLE void TreeView::onItemDoubleClicked(int row, int column) {
+Q_INVOKABLE void StorageController::onItemDoubleClicked(int row, int column) {
     QModelIndex index = m_standardModel->index(row,column);
     onDoubleClick(index);
 };
 
-Q_INVOKABLE void TreeView::filterWithKey(const QString& key) {
+Q_INVOKABLE void StorageController::filterWithKey(const QString& key) {
     m_rootNode->removeRows(0, m_rootNode->rowCount());
     QVector<QStringList> filteredContacts = m_SQLmanager->filterWithKey(key);
     for (QStringList contactList : filteredContacts) {
@@ -43,7 +43,7 @@ Q_INVOKABLE void TreeView::filterWithKey(const QString& key) {
     }
 }
 
-void TreeView::getDataFromDB()
+void StorageController::getDataFromDB()
 {
     m_rootNode->removeRows(0, m_rootNode->rowCount());
     QVector<QStringList> contactsVec = m_SQLmanager->getData();
@@ -55,13 +55,13 @@ void TreeView::getDataFromDB()
     }
 }
 
-QList<QStandardItem *> TreeView::prepareRow(const QString &first, const QString &second, const QString &third) const
+QList<QStandardItem *> StorageController::prepareRow(const QString &first, const QString &second, const QString &third) const
 {
     return {new QStandardItem(first), new QStandardItem(second), new QStandardItem(third)};
 }
 
 
-void TreeView::onDoubleClick(const QModelIndex &index)
+void StorageController::onDoubleClick(const QModelIndex &index)
 {
     QString name = m_standardModel->data(index).toString();
     m_standardModel->removeRow(index.row());

@@ -15,11 +15,11 @@ QT += sql
 SOURCES += \
     main.cpp \
     sqlmanager.cpp \
-    treeview.cpp
+    storagecontroller.cpp
 
 HEADERS += \
     sqlmanager.h \
-    treeview.h
+    storagecontroller.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

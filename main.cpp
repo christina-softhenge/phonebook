@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include "treeview.h"
+#include "storagecontroller.h"
 
 int main(int argc, char *argv[])
 {
@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
         &app,
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
-    TreeView treeView;
-    engine.rootContext()->setContextProperty("treeViewProperty", &treeView);
+    StorageController storageController;
+    engine.rootContext()->setContextProperty("storageControllerProperty", &storageController);
     engine.load(QUrl::fromLocalFile("/home/kristina/Qt_projects/phonebook/Main.qml"));
 
     return app.exec();

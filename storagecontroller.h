@@ -3,20 +3,19 @@
 #include "sqlmanager.h"
 
 #include <QMainWindow>
-#include <QTreeView>
 #include <QStandardItemModel>
 #include <QFileSystemWatcher>
 #include <QFileDialog>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
 
-class TreeView : public QObject
+class StorageController : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QAbstractItemModel* model READ getModel)
 public:
-    TreeView(QObject *parent = nullptr);
-    ~TreeView();
+    StorageController(QObject *parent = nullptr);
+    ~StorageController();
 
     Q_INVOKABLE void addContact(const QString& name,const QString& phone,const QString& birthDate,const QString& email);
     Q_INVOKABLE void onItemDoubleClicked(int row, int column);

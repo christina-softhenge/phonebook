@@ -21,7 +21,7 @@ ApplicationWindow {
             id: treeView
             Layout.fillWidth: true
             Layout.fillHeight: true
-            model: treeViewProperty.model
+            model: storageControllerProperty.model
 
             delegate: TreeViewDelegate {
                 indentation: 20
@@ -38,7 +38,7 @@ ApplicationWindow {
                     propagateComposedEvents: true
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                     onDoubleClicked: {
-                        treeViewProperty.onItemDoubleClicked(model.row, model.column)
+                        storageControllerProperty.onItemDoubleClicked(model.row, model.column)
                     }
                 }
             }
@@ -75,7 +75,7 @@ ApplicationWindow {
                     radius: 10
                 }
                 onClicked: {
-                    treeViewProperty.filterWithKey(filterEdit.text)
+                    storageControllerProperty.filterWithKey(filterEdit.text)
                 }
             }
         }
