@@ -38,7 +38,7 @@ ApplicationWindow {
                     propagateComposedEvents: true
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                     onDoubleClicked: {
-                        storageControllerProperty.onItemDoubleClicked(model.row, model.column)
+                        storageControllerProperty.removeRow(model.row, model.column)
                     }
                 }
             }
@@ -63,6 +63,11 @@ ApplicationWindow {
             CustomTextEdit {
                 id: filterEdit
                 border.color: "black"
+                onTextChanged: {
+                    if (filterEdit.text.length >= 3 || filterEdit.text.length == 0) {
+                        storageControllerProperty.filterWithKey(text)
+                    }
+                }
             }
 
             Button {
@@ -75,7 +80,7 @@ ApplicationWindow {
                     radius: 10
                 }
                 onClicked: {
-                    storageControllerProperty.filterWithKey(filterEdit.text)
+                    storageControllerProperty.filterWithKey(filterEdit.text);
                 }
             }
         }
