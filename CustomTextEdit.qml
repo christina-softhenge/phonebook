@@ -5,11 +5,6 @@ Rectangle {
     implicitHeight: 25
     property alias text: input.text
 
-
-    onHeightChanged: {
-        console.log("height", height, implicitHeight, width, implicitWidth)
-    }
-
     Flickable {
         id: flick
         topMargin: 4

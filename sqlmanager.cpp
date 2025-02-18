@@ -27,6 +27,29 @@ QStringList SQLmanager::addContact(const QString& name, const QString& phone, co
     return {};
 }
 
+void SQLmanager::editContact(const QString& key, const QStringList& changedRow) {
+    QStringList dateParts = changedRow[2].split('-');
+    QDate birthdate(dateParts[0].toInt(), dateParts[1].toInt(), dateParts[2].toInt());
+
+    QSqlQuery query;
+    query.prepare(R"(
+        UPDATE contacts
+        SET name = :newName,
+            phone = :newPhone,
+            birthdate = :newDate,
+            email = :newEmail
+        WHERE name LIKE :key
+        )");
+    query.bindValue(":key", key);
+    query.bindValue(":newName", changedRow[0]);
+    query.bindValue(":newPhone", changedRow[1]);
+    query.bindValue(":newDate", birthdate);
+    query.bindValue(":newEmail", changedRow[3]);
+    if (!query.exec()) {
+        qDebug() << "Failed to edit contact:" << query.lastError().text();
+    }
+}
+
 QVector<QStringList> SQLmanager::filterWithKey(const QString& key) {
     QSqlQuery query;
     query.prepare(R"(

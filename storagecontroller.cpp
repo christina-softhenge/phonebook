@@ -19,8 +19,8 @@ StorageController::~StorageController()
 { }
 
 Q_INVOKABLE void StorageController::addContact(const QString& name, const QString& phone, const QString& birthDate, const QString& email) {
-    QStringList dateParts = birthDate.split('/');
-    QDate birthdate(dateParts[2].toInt(), dateParts[1].toInt(), dateParts[0].toInt());
+    QStringList dateParts = birthDate.split('-');
+    QDate birthdate(dateParts[0].toInt(), dateParts[1].toInt(), dateParts[2].toInt());
 
     QStringList list = m_SQLmanager->addContact(name, phone, birthdate, email);
     QStandardItem* item = new QStandardItem(list[0]);
@@ -33,6 +33,25 @@ Q_INVOKABLE void StorageController::removeRow(int row, int column) {
     QModelIndex index = m_standardModel->index(row,column);
     onDoubleClick(index);
 };
+
+Q_INVOKABLE QStringList StorageController::getRow(int row, int column) {
+    QModelIndex nameIndex = m_standardModel->index(row,column);
+    QModelIndex phoneIndex = m_standardModel->index(0,0,nameIndex);
+    QModelIndex dateIndex = m_standardModel->index(1,0,nameIndex);
+    QModelIndex emailIndex = m_standardModel->index(2,0,nameIndex);
+
+    QString name = m_standardModel->data(nameIndex).toString();
+    QString phone = m_standardModel->data(phoneIndex).toString();
+    QString date = m_standardModel->data(dateIndex).toString();
+    QString email = m_standardModel->data(emailIndex).toString();
+
+    return {name, phone, date, email};
+}
+
+Q_INVOKABLE void StorageController::editRow(const QString& key, const QStringList& changedRow) {
+    m_SQLmanager->editContact(key, changedRow);
+    getDataFromDB();
+}
 
 Q_INVOKABLE void StorageController::filterWithKey(const QString& key) {
     m_rootNode->removeRows(0, m_rootNode->rowCount());

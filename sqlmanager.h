@@ -9,6 +9,7 @@ class SQLmanager : public QObject
 public:
     explicit SQLmanager(QObject *parent = nullptr);
     QStringList addContact(const QString& name,const QString& phone,const QDate& birthDate,const QString& email);
+    void editContact(const QString& key, const QStringList& editedContact);
     QVector<QStringList> filterWithKey(const QString& key);
     QVector<QStringList> getData();
     void removeRow(const QString& name);

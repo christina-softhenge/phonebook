@@ -22,6 +22,7 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             model: storageControllerProperty.model
+            property bool editMode: false
 
             delegate: TreeViewDelegate {
                 indentation: 20
@@ -38,7 +39,17 @@ ApplicationWindow {
                     propagateComposedEvents: true
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                     onDoubleClicked: {
-                        storageControllerProperty.removeRow(model.row, model.column)
+                        if (treeView.editMode == false) {
+                            storageControllerProperty.removeRow(model.row, model.column)
+                        } else {
+                            var rowData = storageControllerProperty.getRow(model.row, model.column)
+                            addContactPopup.editMode = true;
+                            addContactPopup.name = rowData[0]
+                            addContactPopup.phone = rowData[1]
+                            addContactPopup.date = rowData[2]
+                            addContactPopup.email = rowData[3]
+                            addContactPopup.open()
+                        }
                     }
                 }
             }
@@ -49,13 +60,14 @@ ApplicationWindow {
             Button {
                 id: newContactButton
                 text: "New contact"
-                implicitWidth: 100
+                implicitWidth: 150
                 implicitHeight: 50
                 background: Rectangle {
                     color: "lightblue"
                     radius: 10
                 }
                 onClicked: {
+                    addContactPopup.editMode = false;
                     addContactPopup.open()
                 }
             }
@@ -73,7 +85,7 @@ ApplicationWindow {
             Button {
                 id: filterButton
                 text: "Filter"
-                implicitWidth: 100
+                implicitWidth: 150
                 implicitHeight: 50
                 background: Rectangle {
                     color: "lightblue"
@@ -81,6 +93,26 @@ ApplicationWindow {
                 }
                 onClicked: {
                     storageControllerProperty.filterWithKey(filterEdit.text);
+                }
+            }
+
+            Button {
+                id: editButton
+                text: "Edit"
+                implicitWidth: 150
+                implicitHeight: 50
+                background: Rectangle {
+                    color: "lightblue"
+                    radius: 10
+                }
+                onClicked: {
+                    if (treeView.editMode == false) {
+                        text ="Select contact"
+                        treeView.editMode = true
+                    } else {
+                        text = "Edit"
+                        treeView.editMode = false
+                    }
                 }
             }
         }

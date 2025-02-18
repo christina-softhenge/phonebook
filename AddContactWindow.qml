@@ -7,17 +7,28 @@ Popup {
     width: 400
     height: 300
     closePolicy: Popup.CloseOnEscape
+    property bool editMode: false
+    property string name: ""
+    property string phone: ""
+    property string date: ""
+    property string email: ""
+
+    property string originalName: ""
 
     onOpened: {
-        name.text = ""
-        phone.text = ""
-        birthDate.text = ""
-        email.text = ""
-        name.border.color = "black"
-        phone.border.color = "black"
-        birthDate.border.color = "black"
-        email.border.color = "black"
-        warningText.text = ""
+        if (!editMode) {
+            nameEdit.text = ""
+            phoneEdit.text = ""
+            birthDateEdit.text = ""
+            emailEdit.text = ""
+            nameEdit.border.color = "black"
+            phoneEdit.border.color = "black"
+            birthDateEdit.border.color = "black"
+            emailEdit.border.color = "black"
+            warningText.text = ""
+        } else {
+            originalName = nameEdit.text
+        }
     }
 
     Rectangle {
@@ -36,8 +47,9 @@ Popup {
                 }
 
                 CustomTextEdit {
-                    id: name
+                    id: nameEdit
                     border.color: "black"
+                    text: addContactWindow.name
                 }
 
                 Text {
@@ -45,8 +57,9 @@ Popup {
                 }
 
                 CustomTextEdit {
-                    id: phone
+                    id: phoneEdit
                     border.color: "black"
+                    text: addContactWindow.phone
                 }
 
                 Text {
@@ -54,8 +67,9 @@ Popup {
                 }
 
                 CustomTextEdit {
-                    id: birthDate
+                    id: birthDateEdit
                     border.color: "black"
+                    text: addContactWindow.date
                 }
 
                 Text {
@@ -63,8 +77,9 @@ Popup {
                 }
 
                 CustomTextEdit {
-                    id: email
+                    id: emailEdit
                     border.color: "black"
+                    text: addContactWindow.email
                 }
                 Text {
                     id: warningText
@@ -74,13 +89,14 @@ Popup {
             RowLayout {
                 id: rowLayout
                 Button {
+                    id: saveButton
                     implicitHeight: 25
                     text: "save"
                     onClicked: {
                         let phoneRegex = /^\d+$/
                         let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
                         let nameRegex = /^[a-zA-Z\s]+$/;  // Matches only alphabets and spaces for name
-                        let birthdateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/
+                        let birthdateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/
 
                         function validateInput(field, regex, element) {
                             if (!regex.test(field)) {
@@ -94,13 +110,18 @@ Popup {
                         warningText.text = ""
 
                         let isValid = true
-                        isValid &= validateInput(name.text, nameRegex, name)
-                        isValid &= validateInput(phone.text, phoneRegex, phone)
-                        isValid &= validateInput(birthDate.text, birthdateRegex, birthDate)
-                        isValid &= validateInput(email.text, emailRegex, email)
+                        isValid &= validateInput(nameEdit.text, nameRegex, nameEdit)
+                        isValid &= validateInput(phoneEdit.text, phoneRegex, phoneEdit)
+                        isValid &= validateInput(birthDateEdit.text, birthdateRegex, birthDateEdit)
+                        isValid &= validateInput(emailEdit.text, emailRegex, emailEdit)
 
                         if (isValid) {
-                            storageControllerProperty.addContact(name.text, phone.text, birthDate.text, email.text)
+                            if (editMode == false) {
+                                storageControllerProperty.addContact(nameEdit.text, phoneEdit.text, birthDateEdit.text, emailEdit.text)
+                            } else {
+                                var stringList = [nameEdit.text, phoneEdit.text, birthDateEdit.text, emailEdit.text]
+                                storageControllerProperty.editRow(addContactWindow.originalName,stringList)
+                            }
                             addContactWindow.close()
                         } else {
                             if (warningText.text === "") {
@@ -110,6 +131,7 @@ Popup {
                     }
                 }
                 Button {
+                    id: cancelButton
                     implicitHeight: 25
                     text: "cancel"
                     onClicked: addContactWindow.close()
