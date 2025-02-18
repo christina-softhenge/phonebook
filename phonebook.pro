@@ -14,9 +14,11 @@ QT += sql
 
 SOURCES += \
     main.cpp \
+    sqlmanager.cpp \
     treeview.cpp
 
 HEADERS += \
+    sqlmanager.h \
     treeview.h
 
 # Default rules for deployment.
