@@ -11,7 +11,7 @@ SQLmanager::SQLmanager(QObject *parent)
     createTable();
 }
 
-QStringList SQLmanager::addContact(const QString& name,const QString& phone,const QDate& birthDate,const QString& email) {
+QStringList SQLmanager::addContact(const QString& name, const QString& phone, const QDate& birthDate, const QString& email) {
     QSqlQuery query;
     query.prepare("INSERT IGNORE INTO contacts (name, phone, birthdate, email) "
                   "VALUES (:name, :phone, :birthdate, :email)");

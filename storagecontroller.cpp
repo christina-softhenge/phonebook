@@ -1,4 +1,6 @@
 #include "storagecontroller.h"
+#include "sqlmanager.h"
+
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
@@ -16,9 +18,9 @@ StorageController::StorageController(QObject *parent)
 StorageController::~StorageController()
 { }
 
-Q_INVOKABLE void StorageController::addContact(const QString& name,const QString& phone,const QString& birthDate,const QString& email) {
+Q_INVOKABLE void StorageController::addContact(const QString& name, const QString& phone, const QString& birthDate, const QString& email) {
     QStringList dateParts = birthDate.split('/');
-    QDate birthdate(dateParts[2].toInt(),dateParts[1].toInt(),dateParts[0].toInt());
+    QDate birthdate(dateParts[2].toInt(), dateParts[1].toInt(), dateParts[0].toInt());
 
     QStringList list = m_SQLmanager->addContact(name, phone, birthdate, email);
     QStandardItem* item = new QStandardItem(list[0]);
@@ -27,7 +29,7 @@ Q_INVOKABLE void StorageController::addContact(const QString& name,const QString
     item->appendColumn(row);
 }
 
-Q_INVOKABLE void StorageController::onItemDoubleClicked(int row, int column) {
+Q_INVOKABLE void StorageController::removeRow(int row, int column) {
     QModelIndex index = m_standardModel->index(row,column);
     onDoubleClick(index);
 };
@@ -35,7 +37,7 @@ Q_INVOKABLE void StorageController::onItemDoubleClicked(int row, int column) {
 Q_INVOKABLE void StorageController::filterWithKey(const QString& key) {
     m_rootNode->removeRows(0, m_rootNode->rowCount());
     QVector<QStringList> filteredContacts = m_SQLmanager->filterWithKey(key);
-    for (QStringList contactList : filteredContacts) {
+    for (const QStringList& contactList : filteredContacts) {
         QStandardItem* item = new QStandardItem(contactList[0]);
         auto row = prepareRow(contactList[1], contactList[2], contactList[3]);
         m_standardModel->appendRow(item);
@@ -47,7 +49,7 @@ void StorageController::getDataFromDB()
 {
     m_rootNode->removeRows(0, m_rootNode->rowCount());
     QVector<QStringList> contactsVec = m_SQLmanager->getData();
-    for (QStringList contactList : contactsVec) {
+    for (const QStringList& contactList : contactsVec) {
         QStandardItem* item = new QStandardItem(contactList[0]);
         auto row = prepareRow(contactList[1], contactList[2], contactList[3]);
         m_standardModel->appendRow(item);

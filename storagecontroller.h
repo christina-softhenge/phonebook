@@ -1,6 +1,5 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-#include "sqlmanager.h"
 
 #include <QMainWindow>
 #include <QStandardItemModel>
@@ -8,6 +7,8 @@
 #include <QFileDialog>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
+
+class SQLmanager;
 
 class StorageController : public QObject
 {
@@ -17,8 +18,8 @@ public:
     StorageController(QObject *parent = nullptr);
     ~StorageController();
 
-    Q_INVOKABLE void addContact(const QString& name,const QString& phone,const QString& birthDate,const QString& email);
-    Q_INVOKABLE void onItemDoubleClicked(int row, int column);
+    Q_INVOKABLE void addContact(const QString& name, const QString& phone, const QString& birthDate, const QString& email);
+    Q_INVOKABLE void removeRow(int row, int column);
     Q_INVOKABLE void filterWithKey(const QString& key);
     Q_INVOKABLE QAbstractItemModel* getModel() const { return m_standardModel; }
 private:
