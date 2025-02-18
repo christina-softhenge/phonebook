@@ -100,7 +100,7 @@ Popup {
                         isValid &= validateInput(email.text, emailRegex, email)
 
                         if (isValid) {
-                            StorageControllerProperty.addContact(name.text, phone.text, birthDate.text, email.text)
+                            storageControllerProperty.addContact(name.text, phone.text, birthDate.text, email.text)
                             addContactWindow.close()
                         } else {
                             if (warningText.text === "") {
