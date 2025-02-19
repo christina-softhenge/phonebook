@@ -23,10 +23,7 @@ Q_INVOKABLE void StorageController::addContact(const QString& name, const QStrin
     QDate birthdate(dateParts[0].toInt(), dateParts[1].toInt(), dateParts[2].toInt());
 
     QStringList list = m_SQLmanager->addContact(name, phone, birthdate, email);
-    QStandardItem* item = new QStandardItem(list[0]);
-    auto row = prepareRow(list[1], list[2], list[3]);
-    m_rootNode->appendRow(item);
-    item->appendColumn(row);
+    getDataFromDB();
 }
 
 Q_INVOKABLE void StorageController::removeRow(int row, int column) {
@@ -34,16 +31,17 @@ Q_INVOKABLE void StorageController::removeRow(int row, int column) {
     onDoubleClick(index);
 };
 
-Q_INVOKABLE QStringList StorageController::getRow(int row, int column) {
-    QModelIndex nameIndex = m_standardModel->index(row,column);
-    QModelIndex phoneIndex = m_standardModel->index(0,0,nameIndex);
-    QModelIndex dateIndex = m_standardModel->index(1,0,nameIndex);
-    QModelIndex emailIndex = m_standardModel->index(2,0,nameIndex);
+Q_INVOKABLE QStringList StorageController::getRow(int row) {
+    QModelIndex nameIndex = m_standardModel->index(row,0);
+    QModelIndex phoneIndex = m_standardModel->index(row,1);
+    QModelIndex dateIndex = m_standardModel->index(row,2);
+    QModelIndex emailIndex = m_standardModel->index(row,3);
 
     QString name = m_standardModel->data(nameIndex).toString();
     QString phone = m_standardModel->data(phoneIndex).toString();
     QString date = m_standardModel->data(dateIndex).toString();
     QString email = m_standardModel->data(emailIndex).toString();
+    qDebug() << name << " " << phone;
 
     return {name, phone, date, email};
 }
@@ -57,10 +55,8 @@ Q_INVOKABLE void StorageController::filterWithKey(const QString& key) {
     m_rootNode->removeRows(0, m_rootNode->rowCount());
     QVector<QStringList> filteredContacts = m_SQLmanager->filterWithKey(key);
     for (const QStringList& contactList : filteredContacts) {
-        QStandardItem* item = new QStandardItem(contactList[0]);
-        auto row = prepareRow(contactList[1], contactList[2], contactList[3]);
-        m_standardModel->appendRow(item);
-        item->appendColumn(row);
+        auto row = prepareRow(contactList[0], contactList[1], contactList[2], contactList[3]);
+        m_standardModel->appendRow(row);
     }
 }
 
@@ -69,16 +65,14 @@ void StorageController::getDataFromDB()
     m_rootNode->removeRows(0, m_rootNode->rowCount());
     QVector<QStringList> contactsVec = m_SQLmanager->getData();
     for (const QStringList& contactList : contactsVec) {
-        QStandardItem* item = new QStandardItem(contactList[0]);
-        auto row = prepareRow(contactList[1], contactList[2], contactList[3]);
-        m_standardModel->appendRow(item);
-        item->appendColumn(row);
+        auto row = prepareRow(contactList[0], contactList[1], contactList[2], contactList[3]);
+        m_standardModel->appendRow(row);
     }
 }
 
-QList<QStandardItem *> StorageController::prepareRow(const QString &first, const QString &second, const QString &third) const
+QList<QStandardItem *> StorageController::prepareRow(const QString &first, const QString &second, const QString &third, const QString &fourth) const
 {
-    return {new QStandardItem(first), new QStandardItem(second), new QStandardItem(third)};
+    return {new QStandardItem(first), new QStandardItem(second), new QStandardItem(third), new QStandardItem(fourth)};
 }
 
 

@@ -20,13 +20,13 @@ public:
 
     Q_INVOKABLE void addContact(const QString& name, const QString& phone, const QString& birthDate, const QString& email);
     Q_INVOKABLE void removeRow(int row, int column);
-    Q_INVOKABLE QStringList getRow(int row, int column);
+    Q_INVOKABLE QStringList getRow(int row);
     Q_INVOKABLE void editRow(const QString& key, const QStringList& changedRow);
     Q_INVOKABLE void filterWithKey(const QString& key);
     Q_INVOKABLE QAbstractItemModel* getModel() const { return m_standardModel; }
 private:
     void getDataFromDB();
-    QList<QStandardItem *> prepareRow(const QString &first, const QString &second, const QString &third) const;
+    QList<QStandardItem *> prepareRow(const QString &first, const QString &second, const QString &third, const QString &fourth) const;
     //slots
     void onDoubleClick(const QModelIndex &index);
 

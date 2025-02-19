@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Window
 import QtQuick.Layouts
-import QtQuick.Dialogs
-import QtCore
 
 ApplicationWindow {
     id: root
@@ -70,7 +68,7 @@ ApplicationWindow {
                     anchors.fill: parent
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignLeft
-                    leftPadding: 7  // Add some padding so it looks natural
+                    leftPadding: 7 
                     visible: filterEdit.text.length === 0
                 }
                 onTextChanged: {
@@ -126,7 +124,7 @@ ApplicationWindow {
 
             columnWidthProvider: function (column) {
                 var totalWidth = tableView.width
-                var columnWidths = [0.25, 0.25, 0.25, 0.25] // Proportional widths (adjust as needed)
+                var columnWidths = [0.25, 0.25, 0.25, 0.25] 
                 return totalWidth * columnWidths[column]
             }
 
