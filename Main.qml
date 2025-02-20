@@ -2,15 +2,13 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Window
 import QtQuick.Layouts
-import QtQuick.Dialogs
-import QtCore
 
 ApplicationWindow {
     id: root
     visible: true
     width: 600
     height: 500
-    title: "Tree View"
+    title: "Phonebook"
 
 
     ColumnLayout {
@@ -48,11 +46,45 @@ ApplicationWindow {
                 }
                 onClicked: {
                     if (tableView.editMode == false) {
-                        text ="Select contact"
+                        text ="Select"
                         tableView.editMode = true
+                        if (tableView.selectedRow != -1) {
+                            var rowData = storageControllerProperty.getRow(tableView.selectedRow)
+                            addContactPopup.editMode = true;
+                            addContactPopup.name = rowData[0]
+                            addContactPopup.phone = rowData[1]
+                            addContactPopup.date = rowData[2]
+                            addContactPopup.email = rowData[3]
+                            addContactPopup.open()
+                        }
                     } else {
                         text = "Edit"
                         tableView.editMode = false
+                    }
+                }
+            }
+
+            Button {
+                id: deleteButton
+                text: "Delete"
+                implicitWidth: 100
+                implicitHeight: 30
+                background: Rectangle {
+                    border.color: "lightgrey"
+                    color: "white"
+                    radius: 5
+                }
+                onClicked: {
+                    if (tableView.selectedRow == -1 && text == "Delete") {
+                        tableView.deleteMode = true
+                        text ="Select"
+                    } else if (tableView.selectedRow != -1){
+                        storageControllerProperty.removeRow(tableView.selectedRow, tableView.model.column)
+                        text = "Delete"
+                        tableView.deleteMode = false
+                    } else {
+                        text = "Delete"
+                        tableView.deleteMode = false
                     }
                 }
             }
@@ -70,7 +102,7 @@ ApplicationWindow {
                     anchors.fill: parent
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignLeft
-                    leftPadding: 7  // Add some padding so it looks natural
+                    leftPadding: 7
                     visible: filterEdit.text.length === 0
                 }
                 onTextChanged: {
@@ -117,8 +149,10 @@ ApplicationWindow {
             id: tableView
             Layout.fillWidth: true
             Layout.fillHeight: true
-            model: storageControllerProperty.model
+            model: storageControllerProperty ? storageControllerProperty.model : null
             property bool editMode: false
+            property int selectedRow: -1
+            property bool deleteMode: false
 
             columnSpacing: 0
             rowSpacing: 0
@@ -126,15 +160,14 @@ ApplicationWindow {
 
             columnWidthProvider: function (column) {
                 var totalWidth = tableView.width
-                var columnWidths = [0.25, 0.25, 0.25, 0.25] // Proportional widths (adjust as needed)
+                var columnWidths = [0.25, 0.25, 0.25, 0.25]
                 return totalWidth * columnWidths[column]
             }
 
             delegate: Rectangle {
+                id: tableViewDalegate
                 implicitWidth: tableView.columnWidthProvider(model.column)
                 implicitHeight: 40
-                border.color: "gray"
-                border.width: 0
                 Rectangle {
                     width: parent.width
                     height: 1
@@ -148,6 +181,12 @@ ApplicationWindow {
                     anchors.bottom: parent.bottom
                 }
 
+                Rectangle {
+                    id: background
+                    anchors.fill: parent
+                    color: tableView.selectedRow === row ? "#ced3d7" : "white"
+                }
+
                 Text {
                     anchors.fill: parent
                     anchors.margins: 4
@@ -156,14 +195,22 @@ ApplicationWindow {
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
                 }
+
                 MouseArea {
                     anchors.fill: parent
                     propagateComposedEvents: true
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
-                    onDoubleClicked: {
-                        if (tableView.editMode == false) {
-                            storageControllerProperty.removeRow(model.row, model.column)
+
+                    onClicked: {
+                        if (tableView.deleteMode == true) {
+                            storageControllerProperty.removeRow(tableView.selectedRow, tableView.model.column)
+                        }
+                        if (tableView.selectedRow == row) {
+                            tableView.selectedRow = -1
                         } else {
+                            tableView.selectedRow = row
+                        }
+                        if (tableView.editMode == true) {
                             var rowData = storageControllerProperty.getRow(model.row)
                             addContactPopup.editMode = true;
                             addContactPopup.name = rowData[0]
