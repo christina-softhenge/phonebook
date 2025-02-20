@@ -1,9 +1,14 @@
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 
 Rectangle {
     implicitWidth: 150
     implicitHeight: 25
+
     property alias text: input.text
+    property alias validator: input.validator
+    readonly property bool acceptableInput: input.acceptableInput
 
     Flickable {
         id: flick
