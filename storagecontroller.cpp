@@ -41,7 +41,6 @@ Q_INVOKABLE QStringList StorageController::getRow(int row) {
     QString phone = m_standardModel->data(phoneIndex).toString();
     QString date = m_standardModel->data(dateIndex).toString();
     QString email = m_standardModel->data(emailIndex).toString();
-    qDebug() << name << " " << phone;
 
     return {name, phone, date, email};
 }

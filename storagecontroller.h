@@ -13,7 +13,7 @@ class SQLmanager;
 class StorageController : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QAbstractItemModel* model READ getModel)
+    Q_PROPERTY(QAbstractItemModel* model READ getModel NOTIFY modelChanged)
 public:
     StorageController(QObject *parent = nullptr);
     ~StorageController();
@@ -29,7 +29,8 @@ private:
     QList<QStandardItem *> prepareRow(const QString &first, const QString &second, const QString &third, const QString &fourth) const;
     //slots
     void onDoubleClick(const QModelIndex &index);
-
+signals:
+    void modelChanged();
 private:
     QStandardItemModel *m_standardModel;
     QStandardItem *m_rootNode;
