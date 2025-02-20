@@ -1,4 +1,5 @@
 #include "sqlmanager.h"
+#include <QApplication>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
@@ -116,6 +117,7 @@ void SQLmanager::setupDB() {
 
     if (!contactsDB.open()) {
         qDebug() << "Error: " << contactsDB.lastError().text();
+        QApplication::quit();
         return;
     }
 
