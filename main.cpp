@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
         Qt::QueuedConnection);
     StorageController storageController;
     engine.rootContext()->setContextProperty("storageControllerProperty", &storageController);
-    engine.load(QUrl::fromLocalFile("/home/kristina/Qt_projects/phonebook/Main.qml"));
+    engine.load(QUrl::fromLocalFile(":/Main.qml"));
 
     return app.exec();
 }

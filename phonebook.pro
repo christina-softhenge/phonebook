@@ -30,4 +30,6 @@ DISTFILES += \
     AddContactWindow.qml \
     CustomTextEdit.qml \
     Main.qml \
-    phonebook.txt
+
+RESOURCES += \
+    resource.qrc

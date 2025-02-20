@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/new/prefix"/>
+    <qresource prefix="/">
+        <file>AddContactWindow.qml</file>
+        <file>CustomTextEdit.qml</file>
+        <file>Main.qml</file>
+    </qresource>
+</RCC>
