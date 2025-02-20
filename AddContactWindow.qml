@@ -50,6 +50,7 @@ Popup {
                     id: nameEdit
                     border.color: "black"
                     text: addContactWindow.name
+                    validator: RegularExpressionValidator { regularExpression: /^[a-zA-Z\s]+$/ }
                 }
 
                 Text {
@@ -60,6 +61,7 @@ Popup {
                     id: phoneEdit
                     border.color: "black"
                     text: addContactWindow.phone
+                    validator: RegularExpressionValidator { regularExpression: /^\d+$/ }
                 }
 
                 Text {
@@ -70,6 +72,17 @@ Popup {
                     id: birthDateEdit
                     border.color: "black"
                     text: addContactWindow.date
+                    validator: RegularExpressionValidator { regularExpression: /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/ }
+                    Text {
+                        id: placeholderDate
+                        text: "yyyy-mm-dd"
+                        color: "gray"
+                        anchors.fill: parent
+                        verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignLeft
+                        leftPadding: 7
+                        visible: birthDateEdit.text.length === 0
+                    }
                 }
 
                 Text {
@@ -80,6 +93,17 @@ Popup {
                     id: emailEdit
                     border.color: "black"
                     text: addContactWindow.email
+                    validator: RegularExpressionValidator { regularExpression: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/ }
+                    Text {
+                        id: placeholderEmail
+                        text: "name@example.com"
+                        color: "gray"
+                        anchors.fill: parent
+                        verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignLeft
+                        leftPadding: 7
+                        visible: emailEdit.text.length === 0
+                    }
                 }
                 Text {
                     id: warningText
@@ -93,40 +117,27 @@ Popup {
                     implicitHeight: 25
                     text: "save"
                     onClicked: {
-                        let phoneRegex = /^\d+$/
-                        let emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-                        let nameRegex = /^[a-zA-Z\s]+$/;  // Matches only alphabets and spaces for name
-                        let birthdateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/
+                        var inputs = [nameEdit, phoneEdit, birthDateEdit, emailEdit]
+                        var allValid = true
 
-                        function validateInput(field, regex, element) {
-                            if (!regex.test(field)) {
-                                element.border.color = "red"
-                                return false;
+                        for (var i = 0; i < inputs.length; i++) {
+                            if (!inputs[i].acceptableInput) {
+                                warningText.text = "Invalid input!"
+                                inputs[i].border.color = "red"
+                                allValid = false
                             } else {
-                                element.border.color = "black"
-                                return true;
+                                inputs[i].border.color = "black"
                             }
                         }
-                        warningText.text = ""
 
-                        let isValid = true
-                        isValid &= validateInput(nameEdit.text, nameRegex, nameEdit)
-                        isValid &= validateInput(phoneEdit.text, phoneRegex, phoneEdit)
-                        isValid &= validateInput(birthDateEdit.text, birthdateRegex, birthDateEdit)
-                        isValid &= validateInput(emailEdit.text, emailRegex, emailEdit)
-
-                        if (isValid) {
-                            if (editMode == false) {
+                        if (allValid) {
+                            if (!addContactWindow.editMode) {
                                 storageControllerProperty.addContact(nameEdit.text, phoneEdit.text, birthDateEdit.text, emailEdit.text)
                             } else {
                                 var stringList = [nameEdit.text, phoneEdit.text, birthDateEdit.text, emailEdit.text]
-                                storageControllerProperty.editRow(addContactWindow.originalName,stringList)
+                                storageControllerProperty.editRow(addContactWindow.originalName, stringList)
                             }
                             addContactWindow.close()
-                        } else {
-                            if (warningText.text === "") {
-                                warningText.text = "Invalid argument."
-                            }
                         }
                     }
                 }
