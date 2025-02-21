@@ -171,9 +171,10 @@ ApplicationWindow {
                 Rectangle {
                     width: parent.width
                     height: 1
-                    color: "gray"
+                    color: "green"
                     anchors.top: parent.top
                 }
+
                 Rectangle {
                     width: parent.width
                     height: 1
@@ -187,14 +188,54 @@ ApplicationWindow {
                     color: tableView.selectedRow === row ? "#ced3d7" : "white"
                 }
 
-                Text {
+                TextField {
                     anchors.fill: parent
                     anchors.margins: 4
                     text: model.display
-                    elide: Text.ElideRight
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
+                    readOnly: true
+
+                    background: Rectangle {
+                        border.width: 0
+                        color: "transparent"
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onDoubleClicked: {
+                            parent.readOnly = false
+                            parent.forceActiveFocus()
+                            parent.selectAll()
+                        }
+                    }
+
+                    onEditingFinished: {
+                        display = text
+                        readOnly = true
+                    }
+
+                    onActiveFocusChanged: {
+                        if (!activeFocus) {
+                            readOnly = true
+                            text = display
+                        }
+                    }
+
+                    Keys.onReturnPressed: {
+                        display = text
+                        readOnly = true
+                        focus = false
+                    }
+
+                    Keys.onEscapePressed: {
+                        text = display
+                        readOnly = true
+                        focus = false
+                    }
                 }
+
+
 
                 MouseArea {
                     anchors.fill: parent
@@ -231,4 +272,5 @@ ApplicationWindow {
     minimumWidth: tableView.implicitWidth
     minimumHeight: tableView.implicitHeight
 }
+
 
