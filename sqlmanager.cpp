@@ -4,12 +4,58 @@
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
 #include <QDate>
+#include <QFile>
 
 SQLmanager::SQLmanager(QObject *parent)
     : QObject{parent}
 {
     setupDB();
     createTable();
+}
+
+void SQLmanager::importFromCSV(const QString& filePath) {
+    QFile csvFile(filePath);
+    if (!csvFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "ERROR: unable to open csv file";
+        return;
+    }
+    QTextStream in(&csvFile);
+    bool firstLine = true;
+
+    QSqlQuery query;
+    query.exec("DELETE "
+               "FROM contacts");
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        if (firstLine) {
+            firstLine = false;
+            continue;
+        }
+
+        QStringList fields = line.split(",");
+
+        QString name = fields[0].trimmed();
+        QString phone = fields[1].trimmed();
+        QString date = fields[2].trimmed();
+        QString email = fields[3].trimmed();
+
+        QDate birthdate = QDate::fromString(date, "yyyy-MM-dd");
+        qDebug() << birthdate.toString("dd-MM-yyyy");
+        query.prepare("INSERT INTO contacts (name, phone, birthdate, email) "
+                      "VALUES (?, ?, ?, ?)");
+        query.addBindValue(name);
+        query.addBindValue(phone);
+        query.addBindValue(birthdate);
+        query.addBindValue(email);
+
+        if (!query.exec()) {
+            qDebug() << "Error inserting data:" << query.lastError().text();
+        }
+    }
+
+    csvFile.close();
+    qDebug() << "CSV data imported successfully!";
 }
 
 QStringList SQLmanager::addContact(const QString& name, const QString& phone, const QDate& birthDate, const QString& email) {
