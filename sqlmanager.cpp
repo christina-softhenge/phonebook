@@ -41,7 +41,6 @@ void SQLmanager::importFromCSV(const QString& filePath) {
         QString email = fields[3].trimmed();
 
         QDate birthdate = QDate::fromString(date, "yyyy-MM-dd");
-        qDebug() << birthdate.toString("dd-MM-yyyy");
         query.prepare("INSERT INTO contacts (name, phone, birthdate, email) "
                       "VALUES (?, ?, ?, ?)");
         query.addBindValue(name);
