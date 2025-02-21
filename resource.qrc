@@ -4,5 +4,6 @@
         <file>AddContactWindow.qml</file>
         <file>CustomTextEdit.qml</file>
         <file>Main.qml</file>
+        <file>csvFile/contacts.csv</file>
     </qresource>
 </RCC>
