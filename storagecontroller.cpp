@@ -12,7 +12,7 @@ StorageController::StorageController(QObject *parent)
     , m_rootNode(m_standardModel->invisibleRootItem())
     , m_SQLmanager(new SQLmanager())
 {
-    getDataFromDB();
+    importFromCSV(":/csvFile/contacts.csv");
 }
 
 StorageController::~StorageController()
@@ -67,6 +67,12 @@ void StorageController::getDataFromDB()
         auto row = prepareRow(contactList[0], contactList[1], contactList[2], contactList[3]);
         m_standardModel->appendRow(row);
     }
+}
+
+void StorageController::importFromCSV(const QString& filepath) 
+{
+    m_SQLmanager->importFromCSV(filepath);
+    getDataFromDB();
 }
 
 QList<QStandardItem *> StorageController::prepareRow(const QString &first, const QString &second, const QString &third, const QString &fourth) const

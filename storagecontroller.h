@@ -26,6 +26,7 @@ public:
     Q_INVOKABLE QAbstractItemModel* getModel() const { return m_standardModel; }
 private:
     void getDataFromDB();
+    void importFromCSV(const QString& filepath);
     QList<QStandardItem *> prepareRow(const QString &first, const QString &second, const QString &third, const QString &fourth) const;
     //slots
     void onDoubleClick(const QModelIndex &index);
