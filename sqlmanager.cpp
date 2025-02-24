@@ -170,6 +170,7 @@ void SQLmanager::setupDB() {
     if (!query.exec("CREATE DATABASE IF NOT EXISTS my_database")) {
         qDebug() << "Failed to create database:" << query.lastError().text();
     }
+    query.exec("Delete From contacts");
 }
 
 void SQLmanager::createTable() {
