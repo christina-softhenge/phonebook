@@ -18,6 +18,13 @@ public:
     StorageController(QObject *parent = nullptr);
     ~StorageController();
 
+    Q_INVOKABLE void setPath(QString path) {
+        if (path.startsWith("file://")) {
+            path.remove(0, 7);
+        }
+        filePath = path;
+        importFromCSV();
+    }
     Q_INVOKABLE void addContact(const QString& name, const QString& phone, const QString& birthDate, const QString& email);
     Q_INVOKABLE void removeRow(int row, int column);
     Q_INVOKABLE QStringList getRow(int row);
@@ -26,15 +33,13 @@ public:
     Q_INVOKABLE QAbstractItemModel* getModel() const { return m_standardModel; }
 private:
     void getDataFromDB();
-    void importFromCSV(const QString& filepath);
+    void importFromCSV();
     QList<QStandardItem *> prepareRow(const QString &first, const QString &second, const QString &third, const QString &fourth) const;
-    //slots
-    void onDoubleClick(const QModelIndex &index);
 signals:
     void modelChanged();
 private:
+    QString filePath;
     QStandardItemModel *m_standardModel;
-    QStandardItem *m_rootNode;
     SQLmanager *m_SQLmanager;
 };
 
