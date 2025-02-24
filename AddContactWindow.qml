@@ -7,16 +7,12 @@ Popup {
     width: 400
     height: 300
     closePolicy: Popup.CloseOnEscape
-    property bool editMode: false
     property string name: ""
     property string phone: ""
     property string date: ""
     property string email: ""
 
-    property string originalName: ""
-
     onOpened: {
-        if (!editMode) {
             nameEdit.text = ""
             phoneEdit.text = ""
             birthDateEdit.text = ""
@@ -26,9 +22,6 @@ Popup {
             birthDateEdit.border.color = "black"
             emailEdit.border.color = "black"
             warningText.text = ""
-        } else {
-            originalName = nameEdit.text
-        }
     }
 
     Rectangle {
@@ -131,12 +124,7 @@ Popup {
                         }
 
                         if (allValid) {
-                            if (!addContactWindow.editMode) {
-                                storageControllerProperty.addContact(nameEdit.text, phoneEdit.text, birthDateEdit.text, emailEdit.text)
-                            } else {
-                                var stringList = [nameEdit.text, phoneEdit.text, birthDateEdit.text, emailEdit.text]
-                                storageControllerProperty.editRow(addContactWindow.originalName, stringList)
-                            }
+                            storageControllerProperty.addContact(nameEdit.text, phoneEdit.text, birthDateEdit.text, emailEdit.text)
                             addContactWindow.close()
                         }
                     }
