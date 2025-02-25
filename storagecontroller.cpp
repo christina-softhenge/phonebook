@@ -16,12 +16,16 @@ StorageController::StorageController(QObject *parent)
 StorageController::~StorageController()
 { }
 
+Q_INVOKABLE void StorageController::setDBType(int type) {
+    m_SQLmanager->setDBType(type);
+    importFromCSV();
+}
+
 Q_INVOKABLE void StorageController::setPath(const QString& path) {
     filePath = path;
     if (filePath.startsWith("file://")) {
         filePath.remove(0, 7);
     }
-    importFromCSV();
 }
 
 Q_INVOKABLE void StorageController::addContact(const QString& name, const QString& phone,

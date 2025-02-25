@@ -7,10 +7,12 @@
 #include <QFile>
 
 SQLmanager::SQLmanager(QObject *parent)
-    : QObject{parent}
-{
+    : QObject{parent} {
+}
+
+void SQLmanager::setDBType(int type) {
+    dbType = static_cast<DatabaseType>(type);
     setupDB();
-    createTable();
 }
 
 bool SQLmanager::validateCSV(const QString& filePath) {
@@ -81,12 +83,38 @@ void SQLmanager::importFromCSV(const QString& filePath) {
     }
 
     csvFile.close();
-    qDebug() << "CSV data imported successfully!";
 }
 
-QStringList SQLmanager::addContact(const QString& name, const QString& phone, const QDate& birthDate, const QString& email) {
+QStringList SQLmanager::addContact(const QString& name, const QString& phone,
+                                          const QDate& birthDate, const QString& email) {
+    if (dbType == DatabaseType::MySQL) {
+        return addContactToMySql(name, phone, birthDate, email);
+    } else {
+        return addContactToSqlite(name, phone, birthDate, email);
+    }
+}
+
+QStringList SQLmanager::addContactToMySql(const QString& name, const QString& phone,
+                                const QDate& birthDate, const QString& email) {
     QSqlQuery query;
     query.prepare("INSERT IGNORE INTO contacts (name, phone, birthdate, email) "
+                  "VALUES (:name, :phone, :birthdate, :email)");
+    query.bindValue(":name", name);
+    query.bindValue(":phone", phone);
+    query.bindValue(":birthdate", birthDate);
+    query.bindValue(":email", email);
+    if (!query.exec()) {
+        qDebug() << "Failed to insert contact:" << query.lastError().text();
+    } else {
+        return QStringList { name, phone, birthDate.toString("dd-MM-yyyy"), email };
+    }
+    return {};
+}
+
+QStringList SQLmanager::addContactToSqlite(const QString& name, const QString& phone,
+                                          const QDate& birthDate, const QString& email) {
+    QSqlQuery query;
+    query.prepare("INSERT OR IGNORE INTO contacts (name, phone, birthdate, email) "
                   "VALUES (:name, :phone, :birthdate, :email)");
     query.bindValue(":name", name);
     query.bindValue(":phone", phone);
@@ -113,7 +141,7 @@ void SQLmanager::editContact(const QString& key, const QStringList& changedRow) 
             email = :newEmail
         WHERE name LIKE :key
         )");
-    query.bindValue(":key", key);
+    query.bindValue(":key","%" + key + "%");
     query.bindValue(":newName", changedRow[0]);
     query.bindValue(":newPhone", changedRow[1]);
     query.bindValue(":newDate", birthdate);
@@ -180,6 +208,15 @@ void SQLmanager::removeRow(const QString& name) {
 }
 
 void SQLmanager::setupDB() {
+    if (dbType == DatabaseType::MySQL) {
+        setupMYSQLDB();
+    } else {
+        setupSQLiteDB();
+    }
+    createTable();
+}
+
+void SQLmanager::setupMYSQLDB() {
     QSqlDatabase contactsDB = QSqlDatabase::addDatabase("QMYSQL");
     contactsDB.setHostName("localhost");
     contactsDB.setPort(3306);
@@ -200,6 +237,16 @@ void SQLmanager::setupDB() {
     query.exec("Delete From contacts");
 }
 
+void SQLmanager::setupSQLiteDB() {
+    QSqlDatabase contactsDB = QSqlDatabase::addDatabase("QSQLITE");
+    contactsDB.setDatabaseName("my_database.db");
+    if (!contactsDB.open()) {
+        qDebug() << "Error: " << contactsDB.lastError().text();
+        QApplication::quit();
+        return;
+    }
+}
+
 void SQLmanager::createTable() {
     QString createTableQuery = R"(
                 CREATE TABLE IF NOT EXISTS contacts (
@@ -215,4 +262,3 @@ void SQLmanager::createTable() {
         qDebug() << "Failed to create table:" << query.lastError().text();
     }
 }
-
