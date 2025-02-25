@@ -11,7 +11,41 @@ ApplicationWindow {
     width: 600
     height: 500
     title: "Phonebook"
-
+    Popup {
+        id: chooseDBWindow
+        width: 250
+        height: 200
+        Rectangle {
+            anchors.fill: parent
+            border.color: "black"
+            ColumnLayout {
+                anchors.margins: 20
+                anchors.fill: parent
+                Text {
+                    id: selectText
+                    text: "Select Database" }
+                RowLayout {
+                    Button {
+                        id: sqliteButton
+                        text: "SQLite"
+                        onClicked: {
+                            storageControllerProperty.setDBType(0)
+                            chooseDBWindow.close()
+                        }
+                    }
+                    Button {
+                        id: mysqlButton
+                        text: "MySQL"
+                        onClicked: {
+                            storageControllerProperty.setDBType(1)
+                            chooseDBWindow.close()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Component.onCompleted: chooseDBWindow.open()
 
     ColumnLayout {
         id: mainColumnLayout
@@ -145,6 +179,7 @@ ApplicationWindow {
                 implicitWidth: tableView.columnWidthProvider(model.column)
                 implicitHeight: 40
                 Rectangle {
+                    id: topLine
                     width: parent.width
                     height: 1
                     color: "green"
@@ -152,6 +187,7 @@ ApplicationWindow {
                 }
 
                 Rectangle {
+                    id: bottomLine
                     width: parent.width
                     height: 1
                     color: "gray"
