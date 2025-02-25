@@ -8,6 +8,7 @@ class SQLmanager : public QObject
     Q_OBJECT
 public:
     explicit SQLmanager(QObject *parent = nullptr);
+    bool validateCSV(const QString& filePath);
     void importFromCSV(const QString& filePath);
     QStringList addContact(const QString& name,const QString& phone,const QDate& birthDate,const QString& email);
     void editContact(const QString& key, const QStringList& editedContact);

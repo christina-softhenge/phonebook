@@ -18,13 +18,7 @@ public:
     StorageController(QObject *parent = nullptr);
     ~StorageController();
 
-    Q_INVOKABLE void setPath(QString path) {
-        if (path.startsWith("file://")) {
-            path.remove(0, 7);
-        }
-        filePath = path;
-        importFromCSV();
-    }
+    Q_INVOKABLE void setPath(const QString& path);
     Q_INVOKABLE void addContact(const QString& name, const QString& phone, const QString& birthDate, const QString& email);
     Q_INVOKABLE void removeRow(int row, int column);
     Q_INVOKABLE QStringList getRow(int row);

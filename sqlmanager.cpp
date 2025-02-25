@@ -13,7 +13,34 @@ SQLmanager::SQLmanager(QObject *parent)
     createTable();
 }
 
+bool SQLmanager::validateCSV(const QString& filePath) {
+    QFile csvFile(filePath);
+    if (!csvFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "ERROR: unable to open csv file";
+        return false;
+    }
+    QTextStream in(&csvFile);
+    if (in.atEnd()) {
+        qDebug() << "ERROR: csv file is empty";
+        return false;
+    }
+    int columnCount = -1;
+    while (!in.atEnd()) {
+        QStringList line = in.readLine().split(',');
+        if (columnCount == -1)
+            columnCount = line.count();
+        if (line.count() != columnCount) {
+            qDebug () << "ERROR: invalid csv";
+            return false;
+        }
+    }
+    return true;
+}
+
 void SQLmanager::importFromCSV(const QString& filePath) {
+    if (!validateCSV(filePath)) {
+        return;
+    }
     QFile csvFile(filePath);
     if (!csvFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "ERROR: unable to open csv file";
