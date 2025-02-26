@@ -22,16 +22,16 @@ ApplicationWindow {
 
         MouseArea {
             anchors.fill: parent
-            drag.target: dialog
-            onPressed: {
-                chooseDBWindow.startX = mouse.x
-                chooseDBWindow.startY = mouse.y
+            onPressed: function(event) {
+                chooseDBWindow.startX = event.x
+                chooseDBWindow.startY = event.y
             }
-            onPositionChanged: (mouse) => {
-                chooseDBWindow.x += mouse.x - chooseDBWindow.startX
-                chooseDBWindow.y += mouse.y - chooseDBWindow.startY
+            onPositionChanged: function(event) {
+                chooseDBWindow.x += event.x - chooseDBWindow.startX
+                chooseDBWindow.y += event.y - chooseDBWindow.startY
             }
         }
+
         Rectangle {
             anchors.fill: parent
             border.color: "black"

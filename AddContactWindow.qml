@@ -31,14 +31,13 @@ Dialog {
 
     MouseArea {
         anchors.fill: parent
-        drag.target: dialog
-        onPressed: {
-            addContactWindow.startX = mouse.x
-            addContactWindow.startY = mouse.y
+        onPressed: function(event) {
+            addContactWindow.startX = event.x
+            addContactWindow.startY = event.y
         }
-        onPositionChanged: (mouse) => {
-            addContactWindow.x += mouse.x - addContactWindow.startX
-            addContactWindow.y += mouse.y - addContactWindow.startY
+        onPositionChanged: function(event) {
+            addContactWindow.x += event.x - addContactWindow.startX
+            addContactWindow.y += event.y - addContactWindow.startY
         }
     }
 
