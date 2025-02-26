@@ -11,10 +11,27 @@ ApplicationWindow {
     width: 600
     height: 500
     title: "Phonebook"
-    Popup {
+    Dialog {
         id: chooseDBWindow
         width: 250
         height: 200
+        modal: true
+
+        property real startX
+        property real startY
+
+        MouseArea {
+            anchors.fill: parent
+            drag.target: dialog
+            onPressed: {
+                chooseDBWindow.startX = mouse.x
+                chooseDBWindow.startY = mouse.y
+            }
+            onPositionChanged: (mouse) => {
+                chooseDBWindow.x += mouse.x - chooseDBWindow.startX
+                chooseDBWindow.y += mouse.y - chooseDBWindow.startY
+            }
+        }
         Rectangle {
             anchors.fill: parent
             border.color: "black"

@@ -3,15 +3,19 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQml
 
-Popup {
+Dialog {
     id: addContactWindow
     width: 400
     height: 300
-    closePolicy: Popup.CloseOnEscape
+    modal: true
+    closePolicy: Dialog.CloseOnEscape
     property string name: ""
     property string phone: ""
     property string date: ""
     property string email: ""
+
+    property real startX
+    property real startY
 
     onOpened: {
             nameEdit.text = ""
@@ -23,6 +27,19 @@ Popup {
             birthDateEdit.border.color = "black"
             emailEdit.border.color = "black"
             warningText.text = ""
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        drag.target: dialog
+        onPressed: {
+            addContactWindow.startX = mouse.x
+            addContactWindow.startY = mouse.y
+        }
+        onPositionChanged: (mouse) => {
+            addContactWindow.x += mouse.x - addContactWindow.startX
+            addContactWindow.y += mouse.y - addContactWindow.startY
+        }
     }
 
     Rectangle {
@@ -168,7 +185,7 @@ Popup {
 
                     function generateRandomEmail() {
                         var domains = ["gmail.com", "yahoo.com", "example.com"];
-                        return generateRandomName().toLowerCase() + Math.floor(Math.random() * 100) + "@" + domains[Math.floor(Math.random() * domains.length)];
+                        return nameEdit.text.toLowerCase() + Math.floor(Math.random() * 100) + "@" + domains[Math.floor(Math.random() * domains.length)];
                     }
                     onClicked: {
                         nameEdit.text = generateRandomName();
