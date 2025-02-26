@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQml
 
 Popup {
     id: addContactWindow
@@ -137,6 +138,44 @@ Popup {
                     implicitHeight: 25
                     text: "cancel"
                     onClicked: addContactWindow.close()
+                }
+
+
+                Button {
+                    id: randomGenerateButton
+                    implicitHeight: 25
+                    text: "random value"
+
+                    function generateRandomName() {
+                        var names = ["Mari", "Sargis", "Mesrop", "David", "Emma", "Serine"];
+                        return names[Math.floor(Math.random() * names.length)];
+                    }
+
+                    function generateRandomPhone() {
+                        var phone = "09";
+                        for (var i = 0; i < 7; i++) {
+                            phone += Math.floor(Math.random() * 10);
+                        }
+                        return phone;
+                    }
+
+                    function generateRandomDate() {
+                        var year = Math.floor(Math.random() * (2005 - 1970 + 1)) + 1970;
+                        var month = ("0" + (Math.floor(Math.random() * 12) + 1)).slice(-2);
+                        var day = ("0" + (Math.floor(Math.random() * 28) + 1)).slice(-2);
+                        return year + "-" + month + "-" + day;
+                    }
+
+                    function generateRandomEmail() {
+                        var domains = ["gmail.com", "yahoo.com", "example.com"];
+                        return generateRandomName().toLowerCase() + Math.floor(Math.random() * 100) + "@" + domains[Math.floor(Math.random() * domains.length)];
+                    }
+                    onClicked: {
+                        nameEdit.text = generateRandomName();
+                        phoneEdit.text = generateRandomPhone();
+                        birthDateEdit.text = generateRandomDate();
+                        emailEdit.text = generateRandomEmail();
+                    }
                 }
             }
         }
