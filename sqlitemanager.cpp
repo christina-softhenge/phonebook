@@ -33,17 +33,6 @@ bool Sqlitemanager::setupDB() {
         qDebug() << "Error: " << contactsDB.lastError().text();
         return false;
     }
-
-    QSqlQuery query(contactsDB);
-    query.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
-
-    while (query.next()) {
-        QString tableName = query.value(0).toString();
-        QSqlQuery clearQuery(contactsDB);
-        if (!clearQuery.exec("DELETE FROM " + tableName)) {
-            qDebug() << "Failed to clear table" << tableName << ":" << clearQuery.lastError().text();
-        }
-    }
     createTable();
     return true;
 }

@@ -44,7 +44,6 @@ bool MySqlmanager::setupDB() {
         qDebug() << "Failed to create database:" << query.lastError().text();
         return false;
     }
-    query.exec("Delete From contacts");
     createTable();
     return true;
 }

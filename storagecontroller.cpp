@@ -33,6 +33,7 @@ Q_INVOKABLE bool StorageController::setDBType(int type) {
     if (!m_SQLmanager->setupDB()) {
         return false;
     }
+    getDataFromDB();
     return true;
 }
 
