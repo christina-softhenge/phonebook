@@ -90,7 +90,7 @@ void SQLmanager::editContact(const QString& key, const QStringList& changedRow) 
             phone = :newPhone,
             birthdate = :newDate,
             email = :newEmail
-        WHERE name LIKE :key
+        WHERE email LIKE :key
         )");
     query.bindValue(":key","%" + key + "%");
     query.bindValue(":newName", changedRow[0]);

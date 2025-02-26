@@ -271,7 +271,7 @@ ApplicationWindow {
                     horizontalAlignment: Text.AlignHCenter
                     readOnly: true
 
-                    property string originalName: storageControllerProperty ? storageControllerProperty.getRow(row)[0] : null
+                    property string originalEmail: storageControllerProperty ? storageControllerProperty.getRow(row)[3] : null
                     property var stringList:  storageControllerProperty ? storageControllerProperty.getRow(row) : null
                     property int columnChanged: 0
                     onTextChanged: {
@@ -333,7 +333,7 @@ ApplicationWindow {
                             }
                         }
                         warningText.text = ""
-                        storageControllerProperty.editRow(originalName, stringList)
+                        storageControllerProperty.editRow(originalEmail, stringList)
                     }
 
                     onEditingFinished: {
