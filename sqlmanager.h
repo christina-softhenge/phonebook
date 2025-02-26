@@ -14,7 +14,7 @@ public:
     void editContact(const QString& key, const QStringList& editedContact);
     QVector<QStringList> filterWithKey(const QString& key);
     QVector<QStringList> getData();
-    void removeRow(const QString& name);
+    void removeRow(const QString& email);
     virtual bool setupDB() = 0;
 
 protected:

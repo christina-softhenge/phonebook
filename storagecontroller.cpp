@@ -58,10 +58,11 @@ Q_INVOKABLE bool StorageController::addContact(const QString& name, const QStrin
     return true;
 }
 
-Q_INVOKABLE void StorageController::removeRow(int row, int column) {
-    QModelIndex index = m_standardModel->index(row,column);
-    QString name = m_standardModel->data(index).toString();
-    m_SQLmanager->removeRow(name);
+Q_INVOKABLE void StorageController::removeRow(int row) {
+    QModelIndex index = m_standardModel->index(row,3);
+    QString email = m_standardModel->data(index).toString();
+    qDebug() << email;
+    m_SQLmanager->removeRow(email);
     getDataFromDB();
 };
 

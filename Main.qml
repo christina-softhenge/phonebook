@@ -115,7 +115,7 @@ ApplicationWindow {
                         tableView.deleteMode = true
                         text ="Select"
                     } else if (tableView.selectedRow != -1){
-                        storageControllerProperty.removeRow(tableView.selectedRow, tableView.model.column)
+                        storageControllerProperty.removeRow(tableView.selectedRow)
                         text = "Delete"
                         tableView.deleteMode = false
                     } else {
@@ -372,7 +372,7 @@ ApplicationWindow {
 
                     onClicked: {
                         if (tableView.deleteMode == true) {
-                            storageControllerProperty.removeRow(tableView.selectedRow, tableView.model.column)
+                            storageControllerProperty.removeRow(tableView.selectedRow)
                         }
                         if (tableView.selectedRow == row) {
                             tableView.selectedRow = -1

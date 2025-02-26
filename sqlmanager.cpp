@@ -149,10 +149,10 @@ QVector<QStringList> SQLmanager::getData() {
     return contactsVec;
 }
 
-void SQLmanager::removeRow(const QString& name) {
+void SQLmanager::removeRow(const QString& email) {
     QSqlQuery query;
-    query.prepare("DELETE FROM contacts WHERE name = :name");
-    query.bindValue(":name",name);
+    query.prepare("DELETE FROM contacts WHERE email = :email");
+    query.bindValue(":email",email);
     if (!query.exec()) {
         qDebug() << "Failed to delete contact:" << query.lastError().text();
     }

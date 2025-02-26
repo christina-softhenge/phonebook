@@ -20,7 +20,7 @@ public:
     Q_INVOKABLE bool setDBType(int type);
     Q_INVOKABLE void setPath(const QString& path);
     Q_INVOKABLE bool addContact(const QString& name, const QString& phone, const QString& birthDate, const QString& email);
-    Q_INVOKABLE void removeRow(int row, int column);
+    Q_INVOKABLE void removeRow(int row);
     Q_INVOKABLE QStringList getRow(int row);
     Q_INVOKABLE void editRow(const QString& key, const QStringList& changedRow);
     Q_INVOKABLE void filterWithKey(const QString& key);
