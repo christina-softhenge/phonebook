@@ -11,10 +11,27 @@ ApplicationWindow {
     width: 600
     height: 500
     title: "Phonebook"
-    Popup {
+    Dialog {
         id: chooseDBWindow
         width: 250
         height: 200
+        modal: true
+
+        property real startX
+        property real startY
+
+        MouseArea {
+            anchors.fill: parent
+            onPressed: function(event) {
+                chooseDBWindow.startX = event.x
+                chooseDBWindow.startY = event.y
+            }
+            onPositionChanged: function(event) {
+                chooseDBWindow.x += event.x - chooseDBWindow.startX
+                chooseDBWindow.y += event.y - chooseDBWindow.startY
+            }
+        }
+
         Rectangle {
             anchors.fill: parent
             border.color: "black"
@@ -24,21 +41,35 @@ ApplicationWindow {
                 Text {
                     id: selectText
                     text: "Select Database" }
+                Text {
+                    id: dbwarningText
+                    color: "red"
+                    text: ""
+                }
+
                 RowLayout {
                     Button {
                         id: sqliteButton
                         text: "SQLite"
                         onClicked: {
-                            storageControllerProperty.setDBType(0)
-                            chooseDBWindow.close()
+                            var outcome = storageControllerProperty.setDBType(0)
+                            if (!outcome) {
+                                dbwarningText.text = "Database setup failed."
+                            } else {
+                                chooseDBWindow.close()
+                            }
                         }
                     }
                     Button {
                         id: mysqlButton
                         text: "MySQL"
                         onClicked: {
-                            storageControllerProperty.setDBType(1)
-                            chooseDBWindow.close()
+                            var outcome = storageControllerProperty.setDBType(1)
+                            if (!outcome) {
+                                dbwarningText.text = "Database setup failed."
+                            } else {
+                                chooseDBWindow.close()
+                            }
                         }
                     }
                 }
@@ -84,13 +115,43 @@ ApplicationWindow {
                         tableView.deleteMode = true
                         text ="Select"
                     } else if (tableView.selectedRow != -1){
-                        storageControllerProperty.removeRow(tableView.selectedRow, tableView.model.column)
+                        storageControllerProperty.removeRow(tableView.selectedRow)
                         text = "Delete"
                         tableView.deleteMode = false
                     } else {
                         text = "Delete"
                         tableView.deleteMode = false
                     }
+                }
+            }
+
+            Button {
+                id: changeDbButton
+                text: "Change db"
+                implicitWidth: 100
+                implicitHeight: 30
+                background: Rectangle {
+                    border.color: "lightgrey"
+                    color: "white"
+                    radius: 5
+                }
+                onClicked: {
+                    chooseDBWindow.open()
+                }
+            }
+
+            Button {
+                id: importFromCSVButton
+                text: "import"
+                implicitWidth: 100
+                implicitHeight: 30
+                background: Rectangle {
+                    border.color: "lightgrey"
+                    color: "white"
+                    radius: 5
+                }
+                onClicked: {
+                    fileDialog.open()
                 }
             }
 
@@ -210,7 +271,7 @@ ApplicationWindow {
                     horizontalAlignment: Text.AlignHCenter
                     readOnly: true
 
-                    property string originalName: storageControllerProperty ? storageControllerProperty.getRow(row)[0] : null
+                    property string originalEmail: storageControllerProperty ? storageControllerProperty.getRow(row)[3] : null
                     property var stringList:  storageControllerProperty ? storageControllerProperty.getRow(row) : null
                     property int columnChanged: 0
                     onTextChanged: {
@@ -272,7 +333,7 @@ ApplicationWindow {
                             }
                         }
                         warningText.text = ""
-                        storageControllerProperty.editRow(originalName, stringList)
+                        storageControllerProperty.editRow(originalEmail, stringList)
                     }
 
                     onEditingFinished: {
@@ -311,7 +372,7 @@ ApplicationWindow {
 
                     onClicked: {
                         if (tableView.deleteMode == true) {
-                            storageControllerProperty.removeRow(tableView.selectedRow, tableView.model.column)
+                            storageControllerProperty.removeRow(tableView.selectedRow)
                         }
                         if (tableView.selectedRow == row) {
                             tableView.selectedRow = -1
@@ -334,7 +395,6 @@ ApplicationWindow {
         onRejected: {
             console.log("Canceled")
         }
-        Component.onCompleted: visible = true
     }
 
     AddContactWindow {

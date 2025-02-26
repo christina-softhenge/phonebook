@@ -1,5 +1,6 @@
 #include "storagecontroller.h"
-#include "sqlmanager.h"
+#include "sqlitemanager.h"
+#include "mysqlmanager.h"
 
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
@@ -9,16 +10,31 @@
 StorageController::StorageController(QObject *parent)
     : QObject(parent)
     , m_standardModel(new QStandardItemModel(this))
-    , m_SQLmanager(new SQLmanager())
+    , m_SQLmanager(nullptr)
 {
 }
 
 StorageController::~StorageController()
 { }
 
-Q_INVOKABLE void StorageController::setDBType(int type) {
-    m_SQLmanager->setDBType(type);
-    importFromCSV();
+Q_INVOKABLE bool StorageController::setDBType(int type) {
+    if (m_SQLmanager != nullptr) {
+        delete m_SQLmanager;
+    }
+
+    switch (type) {
+        case 0:
+            m_SQLmanager = new Sqlitemanager();
+            break;
+        case 1:
+            m_SQLmanager = new MySqlmanager();
+    }
+
+    if (!m_SQLmanager->setupDB()) {
+        return false;
+    }
+    getDataFromDB();
+    return true;
 }
 
 Q_INVOKABLE void StorageController::setPath(const QString& path) {
@@ -26,21 +42,27 @@ Q_INVOKABLE void StorageController::setPath(const QString& path) {
     if (filePath.startsWith("file://")) {
         filePath.remove(0, 7);
     }
+    importFromCSV();
 }
 
-Q_INVOKABLE void StorageController::addContact(const QString& name, const QString& phone,
+Q_INVOKABLE bool StorageController::addContact(const QString& name, const QString& phone,
                                                const QString& birthDate, const QString& email) {
     QStringList dateParts = birthDate.split('-');
     QDate birthdate(dateParts[0].toInt(), dateParts[1].toInt(), dateParts[2].toInt());
 
-    QStringList list = m_SQLmanager->addContact(name, phone, birthdate, email);
+    if (!m_SQLmanager->addContact(name, phone, birthdate, email)) {
+        return false;
+    }
     getDataFromDB();
+    qDebug() << "contact " << name << " successfully inserted";
+    return true;
 }
 
-Q_INVOKABLE void StorageController::removeRow(int row, int column) {
-    QModelIndex index = m_standardModel->index(row,column);
-    QString name = m_standardModel->data(index).toString();
-    m_SQLmanager->removeRow(name);
+Q_INVOKABLE void StorageController::removeRow(int row) {
+    QModelIndex index = m_standardModel->index(row,3);
+    QString email = m_standardModel->data(index).toString();
+    qDebug() << email;
+    m_SQLmanager->removeRow(email);
     getDataFromDB();
 };
 

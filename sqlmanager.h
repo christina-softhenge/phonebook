@@ -7,27 +7,17 @@ class SQLmanager : public QObject
 {
     Q_OBJECT
 public:
-    enum DatabaseType {
-        MySQL = 0,
-        SQLite = 1
-    };
     explicit SQLmanager(QObject *parent = nullptr);
-    void setDBType(int type);
     bool validateCSV(const QString& filePath);
     void importFromCSV(const QString& filePath);
-    QStringList addContact(const QString& name,const QString& phone,const QDate& birthDate,const QString& email);
-    QStringList addContactToMySql(const QString& name,const QString& phone,const QDate& birthDate,const QString& email);
-    QStringList addContactToSqlite(const QString& name,const QString& phone,const QDate& birthDate,const QString& email);
+    virtual bool addContact(const QString& name,const QString& phone,const QDate& birthDate,const QString& email) = 0;
     void editContact(const QString& key, const QStringList& editedContact);
     QVector<QStringList> filterWithKey(const QString& key);
     QVector<QStringList> getData();
-    void removeRow(const QString& name);
+    void removeRow(const QString& email);
+    virtual bool setupDB() = 0;
 
-private:
-    DatabaseType dbType;
-    void setupDB();
-    void setupMYSQLDB();
-    void setupSQLiteDB();
+protected:
     void createTable();
 };
 
