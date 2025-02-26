@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QFileSystemWatcher>
-#include <QFileDialog>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
 

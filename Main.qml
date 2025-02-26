@@ -123,6 +123,21 @@ ApplicationWindow {
                 }
             }
 
+            Button {
+                id: importFromCSVButton
+                text: "import"
+                implicitWidth: 100
+                implicitHeight: 30
+                background: Rectangle {
+                    border.color: "lightgrey"
+                    color: "white"
+                    radius: 5
+                }
+                onClicked: {
+                    fileDialog.open()
+                }
+            }
+
             Text {
                 id: warningText
                 color: "red"
@@ -363,7 +378,6 @@ ApplicationWindow {
         onRejected: {
             console.log("Canceled")
         }
-        Component.onCompleted: visible = true
     }
 
     AddContactWindow {

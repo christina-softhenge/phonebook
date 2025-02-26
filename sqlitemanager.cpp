@@ -1,7 +1,6 @@
 #include "sqlitemanager.h"
 
 #include <QDate>
-#include <QApplication>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
@@ -32,7 +31,6 @@ bool Sqlitemanager::setupDB() {
     contactsDB.setDatabaseName("my_database.db");
     if (!contactsDB.open()) {
         qDebug() << "Error: " << contactsDB.lastError().text();
-        QApplication::quit();
         return false;
     }
     return true;

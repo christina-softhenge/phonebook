@@ -19,21 +19,20 @@ StorageController::~StorageController()
 
 Q_INVOKABLE bool StorageController::setDBType(int type) {
     if (m_SQLmanager != nullptr) {
-        m_SQLmanager->deleteLater();
+        delete m_SQLmanager;
     }
 
     switch (type) {
         case 0:
-            m_SQLmanager = new MySqlmanager();
+            m_SQLmanager = new Sqlitemanager();
             break;
         case 1:
-            m_SQLmanager = new Sqlitemanager();
+            m_SQLmanager = new MySqlmanager();
     }
 
     if (!m_SQLmanager->setupDB()) {
         return false;
     }
-    importFromCSV();
     return true;
 }
 
@@ -42,6 +41,7 @@ Q_INVOKABLE void StorageController::setPath(const QString& path) {
     if (filePath.startsWith("file://")) {
         filePath.remove(0, 7);
     }
+    importFromCSV();
 }
 
 Q_INVOKABLE bool StorageController::addContact(const QString& name, const QString& phone,

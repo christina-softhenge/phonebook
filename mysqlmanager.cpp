@@ -1,7 +1,6 @@
 #include "mysqlmanager.h"
 
 #include <QDate>
-#include <QApplication>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
@@ -31,11 +30,12 @@ bool MySqlmanager::setupDB() {
     QSqlDatabase contactsDB = QSqlDatabase::addDatabase("QMYSQL");
     contactsDB.setHostName("localhost");
     contactsDB.setPort(3306);
+    contactsDB.setUserName("root");
+    contactsDB.setPassword("softhenge306");
     contactsDB.setDatabaseName("my_database");
 
     if (!contactsDB.open()) {
         qDebug() << "Error: " << contactsDB.lastError().text();
-        QApplication::quit();
         return false;
     }
 
