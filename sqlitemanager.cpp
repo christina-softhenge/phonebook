@@ -42,9 +42,8 @@ bool Sqlitemanager::setupDB() {
         QSqlQuery clearQuery(contactsDB);
         if (!clearQuery.exec("DELETE FROM " + tableName)) {
             qDebug() << "Failed to clear table" << tableName << ":" << clearQuery.lastError().text();
-        } else {
-            qDebug() << "Cleared table:" << tableName;
         }
     }
+    createTable();
     return true;
 }

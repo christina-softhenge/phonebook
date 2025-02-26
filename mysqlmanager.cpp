@@ -45,5 +45,6 @@ bool MySqlmanager::setupDB() {
         return false;
     }
     query.exec("Delete From contacts");
+    createTable();
     return true;
 }

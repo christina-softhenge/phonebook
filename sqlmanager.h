@@ -17,7 +17,7 @@ public:
     void removeRow(const QString& name);
     virtual bool setupDB() = 0;
 
-private:
+protected:
     void createTable();
 };
 
