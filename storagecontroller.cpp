@@ -1,5 +1,6 @@
 #include "storagecontroller.h"
-#include "sqlmanager.h"
+#include "sqlitemanager.h"
+#include "mysqlmanager.h"
 
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
@@ -9,7 +10,7 @@
 StorageController::StorageController(QObject *parent)
     : QObject(parent)
     , m_standardModel(new QStandardItemModel(this))
-    , m_SQLmanager(new SQLmanager())
+    , m_SQLmanager(nullptr)
 {
 }
 
@@ -17,7 +18,15 @@ StorageController::~StorageController()
 { }
 
 Q_INVOKABLE void StorageController::setDBType(int type) {
-    m_SQLmanager->setDBType(type);
+    if (m_SQLmanager != nullptr) {
+        delete m_SQLmanager;
+    }
+    if (type == 0) {
+        m_SQLmanager = new MySqlmanager();
+    } else if (type == 1) {
+        m_SQLmanager = new Sqlitemanager();
+    }
+    m_SQLmanager->setupDB();
     importFromCSV();
 }
 
