@@ -94,6 +94,21 @@ ApplicationWindow {
                 }
             }
 
+            Button {
+                id: changeDbButton
+                text: "Change db"
+                implicitWidth: 100
+                implicitHeight: 30
+                background: Rectangle {
+                    border.color: "lightgrey"
+                    color: "white"
+                    radius: 5
+                }
+                onClicked: {
+                    chooseDBWindow.open()
+                }
+            }
+
             Text {
                 id: warningText
                 color: "red"
