@@ -124,8 +124,11 @@ Popup {
                         }
 
                         if (allValid) {
-                            storageControllerProperty.addContact(nameEdit.text, phoneEdit.text, birthDateEdit.text, emailEdit.text)
-                            addContactWindow.close()
+                            if (!storageControllerProperty.addContact(nameEdit.text, phoneEdit.text, birthDateEdit.text, emailEdit.text)) {
+                                warningText.text = "insertion failed!"
+                            } else {
+                                addContactWindow.close()
+                            }
                         }
                     }
                 }

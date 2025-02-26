@@ -24,21 +24,35 @@ ApplicationWindow {
                 Text {
                     id: selectText
                     text: "Select Database" }
+                Text {
+                    id: dbwarningText
+                    color: "red"
+                    text: ""
+                }
+
                 RowLayout {
                     Button {
                         id: sqliteButton
                         text: "SQLite"
                         onClicked: {
-                            storageControllerProperty.setDBType(0)
-                            chooseDBWindow.close()
+                            var outcome = storageControllerProperty.setDBType(0)
+                            if (!outcome) {
+                                dbwarningText.text = "Database setup failed."
+                            } else {
+                                chooseDBWindow.close()
+                            }
                         }
                     }
                     Button {
                         id: mysqlButton
                         text: "MySQL"
                         onClicked: {
-                            storageControllerProperty.setDBType(1)
-                            chooseDBWindow.close()
+                            var outcome = storageControllerProperty.setDBType(1)
+                            if (!outcome) {
+                                dbwarningText.text = "Database setup failed."
+                            } else {
+                                chooseDBWindow.close()
+                            }
                         }
                     }
                 }
