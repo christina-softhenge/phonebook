@@ -11,7 +11,7 @@ Sqlitemanager::Sqlitemanager(QObject *parent)
 {
 }
 
-QStringList Sqlitemanager::addContact(const QString& name, const QString& phone,
+bool Sqlitemanager::addContact(const QString& name, const QString& phone,
                        const QDate& birthDate, const QString& email) {
     QSqlQuery query;
     query.prepare("INSERT OR IGNORE INTO contacts (name, phone, birthdate, email) "
@@ -22,18 +22,18 @@ QStringList Sqlitemanager::addContact(const QString& name, const QString& phone,
     query.bindValue(":email", email);
     if (!query.exec()) {
         qDebug() << "Failed to insert contact:" << query.lastError().text();
-    } else {
-        return QStringList { name, phone, birthDate.toString("dd-MM-yyyy"), email };
+        return false;
     }
-    return {};
+    return true;
 }
 
-void Sqlitemanager::setupDB() {
+bool Sqlitemanager::setupDB() {
     QSqlDatabase contactsDB = QSqlDatabase::addDatabase("QSQLITE");
     contactsDB.setDatabaseName("my_database.db");
     if (!contactsDB.open()) {
         qDebug() << "Error: " << contactsDB.lastError().text();
         QApplication::quit();
-        return;
+        return false;
     }
+    return true;
 }

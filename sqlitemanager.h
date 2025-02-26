@@ -6,9 +6,9 @@ class Sqlitemanager : public SQLmanager
 {
 public:
     Sqlitemanager(QObject *parent = nullptr);
-    virtual QStringList addContact(const QString& name, const QString& phone,
+    virtual bool addContact(const QString& name, const QString& phone,
                            const QDate& birthDate, const QString& email) override;
-    void setupDB() override;
+    virtual bool setupDB() override;
 };
 
 #endif // SQLITEMANAGER_H

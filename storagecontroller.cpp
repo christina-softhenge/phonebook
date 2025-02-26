@@ -17,17 +17,24 @@ StorageController::StorageController(QObject *parent)
 StorageController::~StorageController()
 { }
 
-Q_INVOKABLE void StorageController::setDBType(int type) {
+Q_INVOKABLE bool StorageController::setDBType(int type) {
     if (m_SQLmanager != nullptr) {
-        delete m_SQLmanager;
+        m_SQLmanager->deleteLater();
     }
-    if (type == 0) {
-        m_SQLmanager = new MySqlmanager();
-    } else if (type == 1) {
-        m_SQLmanager = new Sqlitemanager();
+
+    switch (type) {
+        case 0:
+            m_SQLmanager = new MySqlmanager();
+            break;
+        case 1:
+            m_SQLmanager = new Sqlitemanager();
     }
-    m_SQLmanager->setupDB();
+
+    if (!m_SQLmanager->setupDB()) {
+        return false;
+    }
     importFromCSV();
+    return true;
 }
 
 Q_INVOKABLE void StorageController::setPath(const QString& path) {
@@ -37,13 +44,17 @@ Q_INVOKABLE void StorageController::setPath(const QString& path) {
     }
 }
 
-Q_INVOKABLE void StorageController::addContact(const QString& name, const QString& phone,
+Q_INVOKABLE bool StorageController::addContact(const QString& name, const QString& phone,
                                                const QString& birthDate, const QString& email) {
     QStringList dateParts = birthDate.split('-');
     QDate birthdate(dateParts[0].toInt(), dateParts[1].toInt(), dateParts[2].toInt());
 
-    QStringList list = m_SQLmanager->addContact(name, phone, birthdate, email);
+    if (!m_SQLmanager->addContact(name, phone, birthdate, email)) {
+        return false;
+    }
     getDataFromDB();
+    qDebug() << "contact " << name << " successfully inserted";
+    return true;
 }
 
 Q_INVOKABLE void StorageController::removeRow(int row, int column) {
