@@ -88,11 +88,14 @@ Q_INVOKABLE void StorageController::editRow(const QString& key, const QStringLis
 
 Q_INVOKABLE void StorageController::filterWithKey(const QString& key) {
     m_standardModel->clear();
+    m_standardModel->deleteLater(); //delete part has to be reviewed
+    m_standardModel = new QStandardItemModel(this);
     QVector<QStringList> filteredContacts = m_SQLmanager->filterWithKey(key);
     for (const QStringList& contactList : filteredContacts) {
         auto row = prepareRow(contactList[0], contactList[1], contactList[2], contactList[3]);
         m_standardModel->appendRow(row);
     }
+    emit modelChanged();
 }
 
 void StorageController::getDataFromDB()
