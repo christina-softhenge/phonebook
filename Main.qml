@@ -11,15 +11,20 @@ ApplicationWindow {
     width: 600
     height: 500
     title: "Phonebook"
+
     Dialog {
         id: chooseDBWindow
         width: 250
         height: 200
         modal: true
-
+        closePolicy: Dialog.CloseOnEscape
         property real startX
         property real startY
 
+        onOpened: {
+            x = (root.width - width) / 2
+            y = (root.height - height) / 2
+        }
         MouseArea {
             anchors.fill: parent
             onPressed: function(event) {
@@ -34,7 +39,7 @@ ApplicationWindow {
 
         Rectangle {
             anchors.fill: parent
-            border.color: "black"
+            border.color: "lightgrey"
             ColumnLayout {
                 anchors.margins: 20
                 anchors.fill: parent
@@ -48,28 +53,36 @@ ApplicationWindow {
                 }
 
                 RowLayout {
-                    Button {
-                        id: sqliteButton
-                        text: "SQLite"
-                        onClicked: {
-                            var outcome = storageControllerProperty.setDBType(0)
-                            if (!outcome) {
-                                dbwarningText.text = "Database setup failed."
-                            } else {
-                                chooseDBWindow.close()
-                            }
+                    ComboBox {
+                        id: dbCombo
+                        property int chosenDb: 0;
+                        model: [ "MySql", "Sqlite" ]
+                        onCurrentIndexChanged: {
+                            chosenDb = currentIndex
                         }
                     }
-                    Button {
-                        id: mysqlButton
-                        text: "MySQL"
-                        onClicked: {
-                            var outcome = storageControllerProperty.setDBType(1)
-                            if (!outcome) {
-                                dbwarningText.text = "Database setup failed."
-                            } else {
-                                chooseDBWindow.close()
-                            }
+                }
+            }
+        }
+
+        footer: Rectangle {
+            width: parent.width
+            height: 50
+
+            Row {
+                spacing: 10
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.margins: 10
+
+                Button {
+                    text: "OK"
+                    onClicked: {
+                        var outcome = storageControllerProperty.setDBType(dbCombo.chosenDb)
+                        if (!outcome) {
+                            dbwarningText.text = "Database setup failed."
+                        } else {
+                            chooseDBWindow.accept()
                         }
                     }
                 }
