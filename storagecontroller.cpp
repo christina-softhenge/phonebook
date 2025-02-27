@@ -24,10 +24,11 @@ Q_INVOKABLE bool StorageController::setDBType(int type) {
 
     switch (type) {
         case 0:
-            m_SQLmanager = new Sqlitemanager();
+            m_SQLmanager = new MySqlmanager();
             break;
         case 1:
-            m_SQLmanager = new MySqlmanager();
+            m_SQLmanager = new Sqlitemanager();
+            break;
     }
 
     if (!m_SQLmanager->setupDB()) {
