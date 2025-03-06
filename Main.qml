@@ -45,7 +45,8 @@ ApplicationWindow {
                 anchors.fill: parent
                 Text {
                     id: selectText
-                    text: "Select Database" }
+                    text: "Select Database"
+                }
                 Text {
                     id: dbwarningText
                     color: "red"
@@ -82,6 +83,7 @@ ApplicationWindow {
                         if (!outcome) {
                             dbwarningText.text = "Database setup failed."
                         } else {
+                            tableView.dbChanged()
                             chooseDBWindow.accept()
                         }
                     }
@@ -124,16 +126,11 @@ ApplicationWindow {
                     radius: 5
                 }
                 onClicked: {
-                    if (tableView.selectedRow == -1 && text == "Delete") {
-                        tableView.deleteMode = true
-                        text ="Select"
-                    } else if (tableView.selectedRow != -1){
-                        storageControllerProperty.removeRow(tableView.selectedRow)
+                    if (tableView.selectedRow != []){
+                        storageControllerProperty.deleteRows(tableView.selectedRows)
                         text = "Delete"
-                        tableView.deleteMode = false
-                    } else {
-                        text = "Delete"
-                        tableView.deleteMode = false
+                        tableView.selectedRows = []
+                        tableView.selectionsChanged()
                     }
                 }
             }
@@ -196,7 +193,6 @@ ApplicationWindow {
                     }
                 }
             }
-
         }
 
         Rectangle {
@@ -235,11 +231,14 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             model: storageControllerProperty ? storageControllerProperty.model : null
-            property int selectedRow: -1
-            property bool deleteMode: false
+            property var selectedRows: []
+            signal selectionsChanged
+            signal dbChanged
+            signal selectAllPressed
 
             columnSpacing: 0
             rowSpacing: 0
+            focus: true
             clip: true
 
             columnWidthProvider: function (column) {
@@ -248,10 +247,50 @@ ApplicationWindow {
                 return totalWidth * columnWidths[column]
             }
 
+            Keys.onPressed: (event) => {
+                if (event.modifiers & Qt.ControlModifier && event.key === Qt.Key_A) {
+                    selectAllPressed()
+                    event.accepted = true
+                }
+            }
+
             delegate: Rectangle {
                 id: tableViewDelegate
                 implicitWidth: tableView.columnWidthProvider(model.column)
                 implicitHeight: 40
+
+                property int rowIndex: (tableView && tableView.model && model.row !== undefined) ? model.row : -1
+                property int colIndex: (tableView && tableView.model && model.column !== undefined) ? model.column : -1
+
+                function resetState() {
+                    if (storageControllerProperty && rowIndex >= 0) {
+                        if (textField) {
+                            textField.text = model.display || ""
+                            if (colIndex === 3 && storageControllerProperty.getRow(rowIndex)) {
+                                textField.originalEmail = storageControllerProperty.getRow(rowIndex)[3]
+                                textField.stringList = storageControllerProperty.getRow(rowIndex)
+                            }
+                        }
+                        background.updateColor()
+                    }
+                }
+
+                Connections {
+                    target: tableView
+                    function onDbChanged() {
+                        tableView.focus = true
+                        tableView.selectedRows = []
+                        background.updateColor()
+                    }
+                    function onSelectAllPressed() {
+                        tableView.selectedRows = Array.from({length: tableView.model.rowCount()}, (_, i) => i)
+                        background.updateColor()
+                    }
+                }
+
+                onRowIndexChanged: resetState()
+                onColIndexChanged: resetState()
+
                 Rectangle {
                     id: topLine
                     width: parent.width
@@ -271,7 +310,16 @@ ApplicationWindow {
                 Rectangle {
                     id: background
                     anchors.fill: parent
-                    color: tableView.selectedRow === row ? "#ced3d7" : "white"
+                    color: tableView.selectedRows.includes(row) ? "#ced3d7" : "white"
+                    Connections {
+                        target: tableView
+                        function onSelectionsChanged() {
+                            background.color = tableView.selectedRows.includes(row) ? "#ced3d7" : "white"
+                        }
+                    }
+                    function updateColor() {
+                        background.color = tableView.selectedRows.includes(row) ? "#ced3d7" : "white";
+                    }
                 }
 
                 TextField {
@@ -382,15 +430,24 @@ ApplicationWindow {
                     anchors.fill: parent
                     propagateComposedEvents: true
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
-
-                    onClicked: {
-                        if (tableView.deleteMode == true) {
-                            storageControllerProperty.removeRow(tableView.selectedRow)
-                        }
-                        if (tableView.selectedRow == row) {
-                            tableView.selectedRow = -1
+                    onClicked: function(mouse) {
+                        if (mouse.modifiers & Qt.ControlModifier) {
+                            let index = tableView.selectedRows.indexOf(row)
+                            if (index !== -1) {
+                                tableView.selectedRows.splice(index, 1)
+                            } else {
+                            tableView.selectedRows.push(row)
+                            }
+                            tableView.selectionsChanged()
                         } else {
-                            tableView.selectedRow = row
+                            let index = tableView.selectedRows.indexOf(row)
+                            if (index !== -1) {
+                                tableView.selectedRows = []
+                            } else {
+                                tableView.selectedRows = []
+                                tableView.selectedRows.push(row)
+                            }
+                            tableView.selectionsChanged()
                         }
                     }
                 }

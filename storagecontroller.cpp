@@ -59,13 +59,15 @@ Q_INVOKABLE bool StorageController::addContact(const QString& name, const QStrin
     return true;
 }
 
-Q_INVOKABLE void StorageController::removeRow(int row) {
-    QModelIndex index = m_standardModel->index(row,3);
-    QString email = m_standardModel->data(index).toString();
-    qDebug() << email;
-    m_SQLmanager->removeRow(email);
-    getDataFromDB();
-};
+Q_INVOKABLE void StorageController::deleteRows(const QVariant &rows) {
+    if (rows.canConvert<QVariantList>()) {
+        QVariantList list = rows.toList();
+        for (const QVariant &item : list) {
+            removeRow(item.toInt());
+        }
+    }
+}
+
 
 Q_INVOKABLE QStringList StorageController::getRow(int row) {
     QModelIndex nameIndex = m_standardModel->index(row,0);
@@ -97,6 +99,13 @@ Q_INVOKABLE void StorageController::filterWithKey(const QString& key) {
     }
     emit modelChanged();
 }
+
+void StorageController::removeRow(int row) {
+    QModelIndex index = m_standardModel->index(row,3);
+    QString email = m_standardModel->data(index).toString();
+    m_SQLmanager->removeRow(email);
+    getDataFromDB();
+};
 
 void StorageController::getDataFromDB()
 {
