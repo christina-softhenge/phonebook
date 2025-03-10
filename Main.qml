@@ -15,7 +15,7 @@ ApplicationWindow {
     Dialog {
         id: chooseDBWindow
         width: 250
-        height: 200
+        height: 180
         modal: true
         closePolicy: Dialog.CloseOnEscape
         property real startX
@@ -24,60 +24,64 @@ ApplicationWindow {
         onOpened: {
             x = (root.width - width) / 2
             y = (root.height - height) / 2
+            dbwarningText.text = ""
         }
-        MouseArea {
-            anchors.fill: parent
-            onPressed: function(event) {
-                chooseDBWindow.startX = event.x
-                chooseDBWindow.startY = event.y
+
+        Rectangle {
+            id: titleBar
+            width: parent.width
+            height: 30
+            color: "#f0f0f0"
+            border.color: "#ccc"
+            anchors.top: parent.top
+
+            Text {
+                anchors.centerIn: parent
+                text: "Select Database"
+                font.bold: true
             }
-            onPositionChanged: function(event) {
-                chooseDBWindow.x += event.x - chooseDBWindow.startX
-                chooseDBWindow.y += event.y - chooseDBWindow.startY
+
+            MouseArea {
+                anchors.fill: parent
+                onPressed: function(event) {
+                    chooseDBWindow.startX = event.x
+                    chooseDBWindow.startY = event.y
+                }
+                onPositionChanged: function(event) {
+                    chooseDBWindow.x += event.x - chooseDBWindow.startX
+                    chooseDBWindow.y += event.y - chooseDBWindow.startY
+                }
             }
         }
 
         Rectangle {
             anchors.fill: parent
+            anchors.topMargin: titleBar.height
             border.color: "lightgrey"
+
             ColumnLayout {
-                anchors.margins: 20
                 anchors.fill: parent
-                Text {
-                    id: selectText
-                    text: "Select Database"
-                }
+                anchors.margins: 20
+                spacing: 15
+
                 Text {
                     id: dbwarningText
                     color: "red"
                     text: ""
+                    visible: text.length > 0
                 }
 
-                RowLayout {
-                    ComboBox {
-                        id: dbCombo
-                        property int chosenDb: 0;
-                        model: [ "MySql", "Sqlite" ]
-                        onCurrentIndexChanged: {
-                            chosenDb = currentIndex
-                        }
-                    }
+                ComboBox {
+                    id: dbCombo
+                    Layout.fillWidth: true
+                    property int chosenDb: 0
+                    model: [ "MySQL", "SQLite" ]
+                    onCurrentIndexChanged: chosenDb = currentIndex
                 }
-            }
-        }
-
-        footer: Rectangle {
-            width: parent.width
-            height: 50
-
-            Row {
-                spacing: 10
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.margins: 10
 
                 Button {
                     text: "OK"
+                    Layout.alignment: Qt.AlignRight
                     onClicked: {
                         var outcome = storageControllerProperty.setDBType(dbCombo.chosenDb)
                         if (!outcome) {
@@ -91,6 +95,9 @@ ApplicationWindow {
             }
         }
     }
+
+
+
     Component.onCompleted: chooseDBWindow.open()
 
     ColumnLayout {
@@ -152,7 +159,7 @@ ApplicationWindow {
 
             Button {
                 id: importFromCSVButton
-                text: "import"
+                text: "Import"
                 implicitWidth: 100
                 implicitHeight: 30
                 background: Rectangle {
@@ -162,6 +169,29 @@ ApplicationWindow {
                 }
                 onClicked: {
                     fileDialog.open()
+                }
+            }
+
+            Button {
+                id: passwordButton
+                text: "Set Password"
+                implicitWidth: 100
+                implicitHeight: 30
+                background: Rectangle {
+                    border.color: "lightgrey"
+                    color: "white"
+                    radius: 5
+                }
+                Connections {
+                    target: passwordPopup
+                    onClosed: {
+                        if (passwordPopup.editPassword) {
+                            passwordButton.text = "Edit Password"
+                        }
+                    }
+                }
+                onClicked: {
+                    passwordPopup.open()
                 }
             }
 
@@ -470,8 +500,13 @@ ApplicationWindow {
     AddContactWindow {
         id: addContactPopup
     }
-    minimumWidth: tableView.implicitWidth
-    minimumHeight: tableView.implicitHeight
+
+    PasswordWindow {
+        id: passwordPopup
+    }
+
+    minimumWidth: mainColumnLayout.implicitWidth+20
+    minimumHeight: mainColumnLayout.implicitHeight
 }
 
 
