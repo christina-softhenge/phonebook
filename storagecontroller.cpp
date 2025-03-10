@@ -11,7 +11,10 @@ StorageController::StorageController(QObject *parent)
     : QObject(parent)
     , m_standardModel(new QStandardItemModel(this))
     , m_SQLmanager(nullptr)
+    , m_settings(new QSettings("SoftHenge","Phonebook"))
 {
+    QString password = "";
+    m_settings->setValue("password",password);
 }
 
 StorageController::~StorageController()
@@ -39,9 +42,9 @@ Q_INVOKABLE bool StorageController::setDBType(int type) {
 }
 
 Q_INVOKABLE void StorageController::setPath(const QString& path) {
-    filePath = path;
-    if (filePath.startsWith("file://")) {
-        filePath.remove(0, 7);
+    m_filePath = path;
+    if (m_filePath.startsWith("file://")) {
+        m_filePath.remove(0, 7);
     }
     importFromCSV();
 }
@@ -100,6 +103,14 @@ Q_INVOKABLE void StorageController::filterWithKey(const QString& key) {
     emit modelChanged();
 }
 
+Q_INVOKABLE void StorageController::setPassword(const QString& password) {
+    m_settings->setValue("password",password);
+}
+
+Q_INVOKABLE QString StorageController::getPassword() {
+    return m_settings->value("password","").toString();
+}
+
 void StorageController::removeRow(int row) {
     QModelIndex index = m_standardModel->index(row,3);
     QString email = m_standardModel->data(index).toString();
@@ -119,7 +130,7 @@ void StorageController::getDataFromDB()
 
 void StorageController::importFromCSV()
 {
-    m_SQLmanager->importFromCSV(filePath);
+    m_SQLmanager->importFromCSV(m_filePath);
     getDataFromDB();
 }
 

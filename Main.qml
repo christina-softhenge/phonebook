@@ -96,9 +96,15 @@ ApplicationWindow {
         }
     }
 
+    Component.onCompleted: {
+        if (storageControllerProperty.getPassword()) {
+            loginPopup.open()
+        } else {
+            console.log(storageControllerProperty.getPassword())
+            chooseDBWindow.open()
+        }
 
-
-    Component.onCompleted: chooseDBWindow.open()
+    }
 
     ColumnLayout {
         id: mainColumnLayout
@@ -185,6 +191,8 @@ ApplicationWindow {
                 Connections {
                     target: passwordPopup
                     onClosed: {
+                        storageControllerProperty.setPassword(passwordPopup.password)
+                        console.log("password: ",storageControllerProperty.getPassword())
                         if (passwordPopup.editPassword) {
                             passwordButton.text = "Edit Password"
                         }
@@ -503,6 +511,10 @@ ApplicationWindow {
 
     PasswordWindow {
         id: passwordPopup
+    }
+
+    LoginWindow {
+        id: loginPopup
     }
 
     minimumWidth: mainColumnLayout.implicitWidth+20

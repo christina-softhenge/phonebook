@@ -6,6 +6,7 @@
 #include <QFileSystemWatcher>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
+#include <QSettings>
 
 class SQLmanager;
 
@@ -25,6 +26,8 @@ public:
     Q_INVOKABLE void editRow(const QString& key, const QStringList& changedRow);
     Q_INVOKABLE void filterWithKey(const QString& key);
     Q_INVOKABLE QAbstractItemModel* getModel() const { return m_standardModel; }
+    Q_INVOKABLE void setPassword(const QString& password);
+    Q_INVOKABLE QString getPassword();
 
 private:
     void removeRow(int row);
@@ -34,9 +37,10 @@ private:
 signals:
     void modelChanged();
 private:
-    QString filePath;
+    QString m_filePath;
     QStandardItemModel *m_standardModel;
     SQLmanager *m_SQLmanager;
+    QSettings* m_settings;
 };
 
 #endif // MAINWINDOW_H
