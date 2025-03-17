@@ -61,7 +61,7 @@ bool MySqlmanager::createUser(const QString& username, const QString& password)
 
 bool MySqlmanager::addContact(const QString& name, const QString& phone,
                               const QDate& birthDate, const QString& email) {
-    QSqlQuery query;
+    QSqlQuery query(m_db);
     query.prepare("INSERT IGNORE INTO contacts (name, phone, birthdate, email) "
                   "VALUES (:name, :phone, :birthdate, :email)");
     query.bindValue(":name", name);
