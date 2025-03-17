@@ -82,8 +82,3 @@ bool Sqlitemanager::validatePassword(const QString& password) {
 
     return (password == storedPassword);
 }
-
-QString Sqlitemanager::getPassword() {
-    QSettings settings;
-    return settings.value("database/password").toString();
-}

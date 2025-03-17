@@ -11,7 +11,6 @@ public:
     virtual bool setupDB(const QString& password) override;
     virtual void setPassword(const QString& password) override;
     bool validatePassword(const QString& password);
-    QString getPassword();
 };
 
 #endif // SQLITEMANAGER_H
