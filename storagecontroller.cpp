@@ -11,6 +11,7 @@ StorageController::StorageController(QObject *parent)
     : QObject(parent)
     , m_standardModel(new QStandardItemModel(this))
     , m_SQLmanager(nullptr)
+    , sortId(4)
 {
 }
 
@@ -54,6 +55,9 @@ Q_INVOKABLE bool StorageController::addContact(const QString& name, const QStrin
     }
     getDataFromDB();
     qDebug() << "contact " << name << " successfully inserted";
+    if (sortId != 4) {
+        sortByField(sortId);
+    }
     return true;
 }
 
@@ -88,7 +92,7 @@ Q_INVOKABLE void StorageController::editRow(const QString& key, const QStringLis
 
 Q_INVOKABLE void StorageController::filterWithKey(const QString& key) {
     m_standardModel->clear();
-    m_standardModel->deleteLater(); //delete part has to be reviewed
+    m_standardModel->deleteLater();
     m_standardModel = new QStandardItemModel(this);
     QVector<QStringList> filteredContacts = m_SQLmanager->filterWithKey(key);
     for (const QStringList& contactList : filteredContacts) {
@@ -102,12 +106,32 @@ Q_INVOKABLE void StorageController::setPassword(const QString& password) {
     m_SQLmanager->setPassword(password);
 }
 
+Q_INVOKABLE void StorageController::sortByField(int field) {
+    sortId = field;
+    QVector<QStringList> data = m_SQLmanager->getData();
+    QStringList fieldList;
+    for (QStringList& list : data) {
+        fieldList.append(list[field]);
+    }
+    mergeSort(fieldList, 0, fieldList.size() - 1);
+    fieldList.removeDuplicates();
+    m_standardModel->clear();
+    QVector<QStringList> contactsVec = m_SQLmanager->getDataByField(field, fieldList);
+    for (const QStringList& contactList : contactsVec) {
+        auto row = prepareRow(contactList[0], contactList[1], contactList[2], contactList[3]);
+        m_standardModel->appendRow(row);
+    }
+}
+
 void StorageController::removeRow(int row) {
     QModelIndex index = m_standardModel->index(row,3);
     QString email = m_standardModel->data(index).toString();
     m_SQLmanager->removeRow(email);
     getDataFromDB();
-};
+    if (sortId != 4) {
+        sortByField(sortId);
+    }
+}
 
 void StorageController::getDataFromDB()
 {
@@ -130,3 +154,55 @@ QList<QStandardItem *> StorageController::prepareRow(const QString &first, const
 {
     return {new QStandardItem(first), new QStandardItem(second), new QStandardItem(third), new QStandardItem(fourth)};
 }
+
+void StorageController::mergeSort(QStringList& list, int left, int right) {
+    if (left >= right)
+        return;
+
+    int mid = left + (right - left) / 2;
+    mergeSort(list, left, mid);
+    mergeSort(list, mid + 1, right);
+    merge(list, left, mid, right);
+}
+
+void StorageController::merge(QStringList& list, int left, int mid, int right) {
+    int n1 = mid - left +1;
+    int n2 = right - mid;
+    QStringList list1(n1);
+    QStringList list2(n2);
+
+    for (int i = 0; i < n1; ++i) {
+        list1[i] = list[left + i];
+    }
+    for (int i = 0; i < n2; ++i) {
+        list2[i] = list[mid + 1 +i];
+    }
+
+    int i = 0, j = 0;
+    int k = left;
+
+    while (i < n1 && j < n2) {
+        if (list1[i] <= list2[j]) {
+            list[k] = list1[i];
+            i++;
+        }
+        else {
+            list[k] = list2[j];
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1) {
+        list[k] = list1[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        list[k] = list2[j];
+        j++;
+        k++;
+    }
+}
+

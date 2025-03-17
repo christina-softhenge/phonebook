@@ -152,6 +152,57 @@ QVector<QStringList> SQLmanager::getData() {
     return contactsVec;
 }
 
+QVector<QStringList> SQLmanager::getDataByField(int fieldID, const QStringList& fieldList) {
+    QSqlQuery query(m_db);
+    switch(fieldID) {
+    case 0:
+        query.prepare("Select name, phone, birthdate, email "
+                      "FROM contacts "
+                      "WHERE name = :field");
+        break;
+    case 1:
+        query.prepare("Select name, phone, birthdate, email "
+                      "FROM contacts "
+                      "WHERE phone = :field");
+        break;
+    case 2:
+        query.prepare("Select name, phone, birthdate, email "
+                      "FROM contacts "
+                      "WHERE birthdate = :field");
+        break;
+    case 3:
+        query.prepare("Select name, phone, birthdate, email "
+                      "FROM contacts "
+                      "WHERE email = :field");
+        break;
+    default:
+        return {};
+    }
+    QVector<QStringList> sortedContacts;
+    for (const QString& field : fieldList) {
+        if (fieldID == 2) {
+            QStringList dateParts = field.split('-');
+            QDate birthdate(dateParts[0].toInt(), dateParts[1].toInt(), dateParts[2].toInt());
+            query.bindValue(":field", birthdate);
+        } else {
+            query.bindValue(":field", field);
+        }
+        if(!query.exec()) {
+            qDebug() << "Failed to retrieve contact by field:" << query.lastError().text();
+        } else {
+            while(query.next()) {
+                QString name = query.value("name").toString();
+                QString phone = query.value("phone").toString();
+                QString birthdate = query.value("birthdate").toString();
+                QString email = query.value("email").toString();
+                QStringList contact {name,phone,birthdate,email};
+                sortedContacts.append(contact);
+            }
+        }
+    }
+    return sortedContacts;
+}
+
 void SQLmanager::removeRow(const QString& email) {
     QSqlQuery query(m_db);
     query.prepare("DELETE FROM contacts WHERE email = :email");

@@ -27,18 +27,21 @@ public:
     Q_INVOKABLE void filterWithKey(const QString& key);
     Q_INVOKABLE QAbstractItemModel* getModel() const { return m_standardModel; }
     Q_INVOKABLE void setPassword(const QString& password);
-
+    Q_INVOKABLE void sortByField(int fieldID);
 private:
     void removeRow(int row);
     void getDataFromDB();
     void importFromCSV();
     QList<QStandardItem *> prepareRow(const QString &first, const QString &second, const QString &third, const QString &fourth) const;
+    void mergeSort(QStringList& list, int left, int right);
+    void merge(QStringList& list, int left, int mid, int right);
 signals:
     void modelChanged();
 private:
     QString m_filePath;
     QStandardItemModel *m_standardModel;
     SQLmanager *m_SQLmanager;
+    int sortId;
 };
 
 #endif // MAINWINDOW_H
