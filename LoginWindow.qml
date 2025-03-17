@@ -6,10 +6,11 @@ Dialog {
     id: loginWindow
     width: 300
     height: 250
+    modal: true
     closePolicy: Dialog.CloseOnEscape
-    property string password: storageControllerProperty.getPassword()
     property real startX
     property real startY
+    property var chosenDb:0
 
     onOpened: {
         x = (root.width - width) / 2
@@ -35,12 +36,12 @@ Dialog {
         MouseArea {
             anchors.fill: parent
             onPressed: function(event) {
-                passwordWindow.startX = event.x
-                passwordWindow.startY = event.y
+                loginWindow.startX = event.x
+                loginWindow.startY = event.y
             }
             onPositionChanged: function(event) {
-                passwordWindow.x += event.x - passwordWindow.startX
-                passwordWindow.y += event.y - passwordWindow.startY
+                loginWindow.x += event.x - loginWindow.startX
+                loginWindow.y += event.y - loginWindow.startY
             }
         }
     }
@@ -61,7 +62,7 @@ Dialog {
                 id: setPasswordEdit
                 Layout.fillWidth: true
                 echoMode: eyeButton.checked ? TextInput.Normal : TextInput.Password
-                validator: RegularExpressionValidator { regularExpression: /^[A-Za-z\d@$!%*?&]{4,}$/ }
+                validator: RegularExpressionValidator { regularExpression: /^[A-Za-z\d@$!%*?&_]{4,}$/ }
                 font.pixelSize: 14
             }
 
@@ -85,12 +86,10 @@ Dialog {
             Button {
                 text: "OK"
                 onClicked: {
-                    if (setPasswordEdit.text == password) {
-                        console.log(password)
+                    if (storageControllerProperty.setDBType(loginWindow.chosenDb, setPasswordEdit.text)) {
                         warningText.text = ""
                         loginWindow.close()
                     } else {
-                        console.log(password)
                         warningText.text = "Password is incorrect"
                     }
                 }
