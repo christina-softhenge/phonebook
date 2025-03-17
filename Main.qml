@@ -157,32 +157,101 @@ ApplicationWindow {
             Layout.fillWidth: true
             height: 35
             color: "#a5bacc"
+
             RowLayout {
                 anchors.fill: parent
                 spacing: 10
-                Text {
-                    text: "Name";
-                    font.bold: true;
-                    padding: 10;
-                    leftPadding: 50;
+
+                RowLayout {
+                    spacing: 5
+                    Text {
+                        text: "Name"
+                        font.bold: true
+                        padding: 10
+                    }
+                    Button {
+                        id: nameSortButton
+                        text: "▼"
+                        font.pixelSize: 11
+                        implicitWidth: 20
+                        implicitHeight: 20
+                        background : {
+                            color: "a5bacc"
+                        }
+                        onClicked : {
+                            storageControllerProperty.sortByField(0)
+                        }
+                    }
                 }
-                Text {
-                    text: "Phone";
-                    font.bold: true;
-                    padding: 10
+
+                RowLayout {
+                    spacing: 5
+                    Text {
+                        text: "Phone"
+                        font.bold: true
+                        padding: 10
+                    }
+                    Button {
+                        id: phoneSortButton
+                        text: "▼"
+                        font.pixelSize: 11
+                        implicitWidth: 20
+                        implicitHeight: 20
+                        background : {
+                            color: "a5bacc"
+                        }
+                        onClicked : {
+                            storageControllerProperty.sortByField(1)
+                        }
+                    }
                 }
-                Text {
-                    text: "Date";
-                    font.bold: true;
-                    padding: 10
+
+                RowLayout {
+                    spacing: 5
+                    Text {
+                        text: "Date"
+                        font.bold: true
+                        padding: 10
+                    }
+                    Button {
+                        id: dateSortButton
+                        text: "▼"
+                        font.pixelSize: 11
+                        implicitWidth: 20
+                        implicitHeight: 20
+                        background : {
+                            color: "a5bacc"
+                        }
+                        onClicked : {
+                            storageControllerProperty.sortByField(2)
+                        }
+                    }
                 }
-                Text {
-                    text: "Email";
-                    font.bold: true;
-                    padding: 10
+
+                RowLayout {
+                    spacing: 5
+                    Text {
+                        text: "Email"
+                        font.bold: true
+                        padding: 10
+                    }
+                    Button {
+                        id: emailSortButton
+                        text: "▼"
+                        font.pixelSize: 11
+                        implicitWidth: 20
+                        implicitHeight: 20
+                        background : {
+                            color: "a5bacc"
+                        }
+                        onClicked : {
+                            storageControllerProperty.sortByField(3)
+                        }
+                    }
                 }
             }
         }
+
 
         TableView {
             id: tableView
