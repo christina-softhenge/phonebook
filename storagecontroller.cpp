@@ -11,16 +11,12 @@ StorageController::StorageController(QObject *parent)
     : QObject(parent)
     , m_standardModel(new QStandardItemModel(this))
     , m_SQLmanager(nullptr)
-    , m_settings(new QSettings("SoftHenge","Phonebook"))
 {
-    QString password = "";
-    m_settings->setValue("password",password);
 }
 
-StorageController::~StorageController()
-{ }
+StorageController::~StorageController() { }
 
-Q_INVOKABLE bool StorageController::setDBType(int type) {
+Q_INVOKABLE bool StorageController::setDBType(int type, const QString& password) {
     if (m_SQLmanager != nullptr) {
         delete m_SQLmanager;
     }
@@ -33,8 +29,7 @@ Q_INVOKABLE bool StorageController::setDBType(int type) {
             m_SQLmanager = new Sqlitemanager();
             break;
     }
-
-    if (!m_SQLmanager->setupDB()) {
+    if (!m_SQLmanager->setupDB(password)) {
         return false;
     }
     getDataFromDB();
@@ -104,11 +99,7 @@ Q_INVOKABLE void StorageController::filterWithKey(const QString& key) {
 }
 
 Q_INVOKABLE void StorageController::setPassword(const QString& password) {
-    m_settings->setValue("password",password);
-}
-
-Q_INVOKABLE QString StorageController::getPassword() {
-    return m_settings->value("password","").toString();
+    m_SQLmanager->setPassword(password);
 }
 
 void StorageController::removeRow(int row) {

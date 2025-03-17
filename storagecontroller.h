@@ -18,7 +18,7 @@ public:
     StorageController(QObject *parent = nullptr);
     ~StorageController();
 
-    Q_INVOKABLE bool setDBType(int type);
+    Q_INVOKABLE bool setDBType(int type, const QString& password);
     Q_INVOKABLE void setPath(const QString& path);
     Q_INVOKABLE bool addContact(const QString& name, const QString& phone, const QString& birthDate, const QString& email);
     Q_INVOKABLE void deleteRows(const QVariant &rows);
@@ -27,7 +27,6 @@ public:
     Q_INVOKABLE void filterWithKey(const QString& key);
     Q_INVOKABLE QAbstractItemModel* getModel() const { return m_standardModel; }
     Q_INVOKABLE void setPassword(const QString& password);
-    Q_INVOKABLE QString getPassword();
 
 private:
     void removeRow(int row);
@@ -40,7 +39,6 @@ private:
     QString m_filePath;
     QStandardItemModel *m_standardModel;
     SQLmanager *m_SQLmanager;
-    QSettings* m_settings;
 };
 
 #endif // MAINWINDOW_H
