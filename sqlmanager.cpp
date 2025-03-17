@@ -45,7 +45,10 @@ void SQLmanager::importFromCSV(const QString& filePath) {
     QTextStream in(&csvFile);
     bool firstLine = true;
 
-    QSqlQuery query;
+    QSqlQuery query(m_db);
+    if (!m_db.isOpen()) {
+        qDebug() << "MySQL driver not available or connection not open:" << m_db.lastError().text();
+    }
     query.exec("DELETE "
                "FROM contacts");
 
@@ -83,7 +86,7 @@ void SQLmanager::editContact(const QString& key, const QStringList& changedRow) 
     QStringList dateParts = changedRow[2].split('-');
     QDate birthdate(dateParts[0].toInt(), dateParts[1].toInt(), dateParts[2].toInt());
 
-    QSqlQuery query;
+    QSqlQuery query(m_db);
     query.prepare(R"(
         UPDATE contacts
         SET name = :newName,
@@ -103,7 +106,7 @@ void SQLmanager::editContact(const QString& key, const QStringList& changedRow) 
 }
 
 QVector<QStringList> SQLmanager::filterWithKey(const QString& key) {
-    QSqlQuery query;
+    QSqlQuery query(m_db);
     query.prepare(R"(
         SELECT * FROM contacts
         WHERE name LIKE :key
@@ -131,7 +134,7 @@ QVector<QStringList> SQLmanager::filterWithKey(const QString& key) {
 }
 
 QVector<QStringList> SQLmanager::getData() {
-    QSqlQuery query;
+    QSqlQuery query(m_db);
     QVector<QStringList> contactsVec;
     if (!query.exec("SELECT name, phone, birthdate, email "
                     "FROM contacts")) {
@@ -150,14 +153,21 @@ QVector<QStringList> SQLmanager::getData() {
 }
 
 void SQLmanager::removeRow(const QString& email) {
-    QSqlQuery query;
+    QSqlQuery query(m_db);
     query.prepare("DELETE FROM contacts WHERE email = :email");
     query.bindValue(":email",email);
     if (!query.exec()) {
         qDebug() << "Failed to delete contact:" << query.lastError().text();
     }
 }
-void SQLmanager::createTable() {
+
+void SQLmanager::createTable(QSqlDatabase& db)
+{
+    m_db = db;
+    if (!m_db.isOpen()) {
+        qDebug() << "MySQL driver not available or connection not open:" << db.lastError().text();
+    }
+
     QString createTableQuery = R"(
                 CREATE TABLE IF NOT EXISTS contacts (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -167,7 +177,7 @@ void SQLmanager::createTable() {
                     email VARCHAR(255) UNIQUE
                 )
             )";
-    QSqlQuery query;
+    QSqlQuery query(m_db);
     if (!query.exec(createTableQuery)) {
         qDebug() << "Failed to create table:" << query.lastError().text();
     }

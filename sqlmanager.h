@@ -2,6 +2,7 @@
 #define SQLMANAGER_H
 
 #include <QObject>
+#include <QSqlDatabase>
 
 class SQLmanager : public QObject
 {
@@ -15,10 +16,13 @@ public:
     QVector<QStringList> filterWithKey(const QString& key);
     QVector<QStringList> getData();
     void removeRow(const QString& email);
-    virtual bool setupDB() = 0;
+    virtual bool setupDB(const QString& password) = 0;
+    virtual void setPassword(const QString& password) = 0;
+protected:
+    void createTable(QSqlDatabase &db);
 
 protected:
-    void createTable();
+    QSqlDatabase m_db;
 };
 
 #endif // SQLMANAGER_H
