@@ -95,11 +95,15 @@ Dialog {
                 text: "OK"
                 onClicked: {
                     if (setPasswordEdit.acceptableInput) {
-                        warningText.text = ""
                         password = setPasswordEdit.text
-                        editPassword = true
-                        console.log("Password set:", password)
-                        passwordWindow.close()
+                        var passwordSet = storageControllerProperty.setPassword(password)
+                        if (!passwordSet) {
+                            warningText.text = ""
+                        } else {
+                            editPassword = true
+                            console.log("Password set:", password)
+                            passwordWindow.close()
+                        }
                     } else {
                         warningText.text = "Invalid password"
                     }

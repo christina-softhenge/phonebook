@@ -26,7 +26,7 @@ public:
     Q_INVOKABLE void editRow(const QString& key, const QStringList& changedRow);
     Q_INVOKABLE void filterWithKey(const QString& key);
     Q_INVOKABLE QAbstractItemModel* getModel() const { return m_standardModel; }
-    Q_INVOKABLE void setPassword(const QString& password);
+    Q_INVOKABLE bool setPassword(const QString& password);
     Q_INVOKABLE void sortByField(int fieldID);
 private:
     void removeRow(int row);

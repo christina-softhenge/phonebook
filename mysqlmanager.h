@@ -9,7 +9,7 @@ public:
     virtual bool addContact(const QString& name, const QString& phone,
                            const QDate& birthDate, const QString& email) override;
     virtual bool setupDB(const QString& password) override;
-    virtual void setPassword(const QString& password) override;
+    virtual bool setPassword(const QString& password) override;
     bool createUser(const QString& username, const QString& password);
 };
 

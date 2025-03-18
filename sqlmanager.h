@@ -18,7 +18,7 @@ public:
     QVector<QStringList> getDataByField(int fieldId, const QStringList& fieldList);
     void removeRow(const QString& email);
     virtual bool setupDB(const QString& password) = 0;
-    virtual void setPassword(const QString& password) = 0;
+    virtual bool setPassword(const QString& password) = 0;
 protected:
     void createTable(QSqlDatabase &db);
 

@@ -102,8 +102,8 @@ Q_INVOKABLE void StorageController::filterWithKey(const QString& key) {
     emit modelChanged();
 }
 
-Q_INVOKABLE void StorageController::setPassword(const QString& password) {
-    m_SQLmanager->setPassword(password);
+Q_INVOKABLE bool StorageController::setPassword(const QString& password) {
+    return m_SQLmanager->setPassword(password);
 }
 
 Q_INVOKABLE void StorageController::sortByField(int field) {

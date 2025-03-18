@@ -106,14 +106,16 @@ bool MySqlmanager::setupDB(const QString& password)
 
 
 
-void MySqlmanager::setPassword(const QString& password) {
+bool MySqlmanager::setPassword(const QString& password) {
     QSqlQuery query(m_db);
     query.prepare("ALTER USER 'username'@'localhost' IDENTIFIED BY :pass");
     query.bindValue(":pass", password);
     if (!query.exec()) {
         qDebug() << "Error updating password:" << query.lastError().text();
+        return false;
     } else {
         qDebug() << "Password updated successfully!";
+        return true;
     }
 }
 
