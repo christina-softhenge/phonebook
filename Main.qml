@@ -11,41 +11,20 @@ ApplicationWindow {
     width: 600
     height: 500
     title: "Phonebook"
-    Popup {
-        id: chooseDBWindow
-        width: 250
-        height: 200
-        Rectangle {
-            anchors.fill: parent
-            border.color: "black"
-            ColumnLayout {
-                anchors.margins: 20
-                anchors.fill: parent
-                Text {
-                    id: selectText
-                    text: "Select Database" }
-                RowLayout {
-                    Button {
-                        id: sqliteButton
-                        text: "SQLite"
-                        onClicked: {
-                            storageControllerProperty.setDBType(0)
-                            chooseDBWindow.close()
-                        }
-                    }
-                    Button {
-                        id: mysqlButton
-                        text: "MySQL"
-                        onClicked: {
-                            storageControllerProperty.setDBType(1)
-                            chooseDBWindow.close()
-                        }
-                    }
-                }
+
+    Component.onCompleted: {
+        chooseDbDialog.open()
+    }
+
+    Connections {
+        target: chooseDbDialog
+        function onClosed() {
+            loginPopup.chosenDb = chooseDbDialog.chosenDb
+            if (!chooseDbDialog.dbIsSet) {
+                loginPopup.open()
             }
         }
     }
-    Component.onCompleted: chooseDBWindow.open()
 
     ColumnLayout {
         id: mainColumnLayout
@@ -80,17 +59,67 @@ ApplicationWindow {
                     radius: 5
                 }
                 onClicked: {
-                    if (tableView.selectedRow == -1 && text == "Delete") {
-                        tableView.deleteMode = true
-                        text ="Select"
-                    } else if (tableView.selectedRow != -1){
-                        storageControllerProperty.removeRow(tableView.selectedRow, tableView.model.column)
+                    if (tableView.selectedRow != []){
+                        storageControllerProperty.deleteRows(tableView.selectedRows)
                         text = "Delete"
-                        tableView.deleteMode = false
-                    } else {
-                        text = "Delete"
-                        tableView.deleteMode = false
+                        tableView.selectedRows = []
+                        tableView.selectionsChanged()
                     }
+                }
+            }
+
+            Button {
+                id: changeDbButton
+                text: "Change db"
+                implicitWidth: 100
+                implicitHeight: 30
+                background: Rectangle {
+                    border.color: "lightgrey"
+                    color: "white"
+                    radius: 5
+                }
+                onClicked: {
+                    chooseDbDialog.open()
+                }
+            }
+
+            Button {
+                id: importFromCSVButton
+                text: "Import"
+                implicitWidth: 100
+                implicitHeight: 30
+                background: Rectangle {
+                    border.color: "lightgrey"
+                    color: "white"
+                    radius: 5
+                }
+                onClicked: {
+                    fileDialog.open()
+                }
+            }
+
+            Button {
+                id: passwordButton
+                text: "Set Password"
+                implicitWidth: 100
+                implicitHeight: 30
+                background: Rectangle {
+                    border.color: "lightgrey"
+                    color: "white"
+                    radius: 5
+                }
+                Connections {
+                    target: passwordPopup
+                    function onClosed() {
+                        storageControllerProperty.setPassword(passwordPopup.password)
+                        if (passwordPopup.editPassword) {
+                            passwordButton.text = "Edit Password"
+                        }
+                    }
+                }
+
+                onClicked: {
+                    passwordPopup.open()
                 }
             }
 
@@ -122,50 +151,121 @@ ApplicationWindow {
                     }
                 }
             }
-
         }
 
         Rectangle {
             Layout.fillWidth: true
             height: 35
             color: "#a5bacc"
+
             RowLayout {
                 anchors.fill: parent
                 spacing: 10
-                Text {
-                    text: "Name";
-                    font.bold: true;
-                    padding: 10;
-                    leftPadding: 50;
+
+                RowLayout {
+                    spacing: 5
+                    Text {
+                        text: "Name"
+                        font.bold: true
+                        padding: 10
+                    }
+                    Button {
+                        id: nameSortButton
+                        text: "▼"
+                        font.pixelSize: 11
+                        implicitWidth: 20
+                        implicitHeight: 20
+                        background : {
+                            color: "a5bacc"
+                        }
+                        onClicked : {
+                            storageControllerProperty.sortByField(0)
+                        }
+                    }
                 }
-                Text {
-                    text: "Phone";
-                    font.bold: true;
-                    padding: 10
+
+                RowLayout {
+                    spacing: 5
+                    Text {
+                        text: "Phone"
+                        font.bold: true
+                        padding: 10
+                    }
+                    Button {
+                        id: phoneSortButton
+                        text: "▼"
+                        font.pixelSize: 11
+                        implicitWidth: 20
+                        implicitHeight: 20
+                        background : {
+                            color: "a5bacc"
+                        }
+                        onClicked : {
+                            storageControllerProperty.sortByField(1)
+                        }
+                    }
                 }
-                Text {
-                    text: "Date";
-                    font.bold: true;
-                    padding: 10
+
+                RowLayout {
+                    spacing: 5
+                    Text {
+                        text: "Date"
+                        font.bold: true
+                        padding: 10
+                    }
+                    Button {
+                        id: dateSortButton
+                        text: "▼"
+                        font.pixelSize: 11
+                        implicitWidth: 20
+                        implicitHeight: 20
+                        background : {
+                            color: "a5bacc"
+                        }
+                        onClicked : {
+                            storageControllerProperty.sortByField(2)
+                        }
+                    }
                 }
-                Text {
-                    text: "Email";
-                    font.bold: true;
-                    padding: 10
+
+                RowLayout {
+                    spacing: 5
+                    Text {
+                        text: "Email"
+                        font.bold: true
+                        padding: 10
+                    }
+                    Button {
+                        id: emailSortButton
+                        text: "▼"
+                        font.pixelSize: 11
+                        implicitWidth: 20
+                        implicitHeight: 20
+                        background : {
+                            color: "a5bacc"
+                        }
+                        onClicked : {
+                            storageControllerProperty.sortByField(3)
+                        }
+                    }
                 }
             }
         }
+
 
         TableView {
             id: tableView
             Layout.fillWidth: true
             Layout.fillHeight: true
             model: storageControllerProperty ? storageControllerProperty.model : null
-            property int selectedRow: -1
-            property bool deleteMode: false
+            property var selectedRows: []
+            signal selectionsChanged
+            signal dbChanged
+            signal selectAllPressed
 
             columnSpacing: 0
             rowSpacing: 0
+            focus: true
             clip: true
 
             columnWidthProvider: function (column) {
@@ -174,10 +274,50 @@ ApplicationWindow {
                 return totalWidth * columnWidths[column]
             }
 
+            Keys.onPressed: (event) => {
+                if (event.modifiers & Qt.ControlModifier && event.key === Qt.Key_A) {
+                    selectAllPressed()
+                    event.accepted = true
+                }
+            }
+
             delegate: Rectangle {
                 id: tableViewDelegate
                 implicitWidth: tableView.columnWidthProvider(model.column)
                 implicitHeight: 40
+
+                property int rowIndex: (tableView && tableView.model && model.row !== undefined) ? model.row : -1
+                property int colIndex: (tableView && tableView.model && model.column !== undefined) ? model.column : -1
+
+                function resetState() {
+                    if (storageControllerProperty && rowIndex >= 0) {
+                        if (textField) {
+                            textField.text = model.display || ""
+                            if (colIndex === 3 && storageControllerProperty.getRow(rowIndex)) {
+                                textField.originalEmail = storageControllerProperty.getRow(rowIndex)[3]
+                                textField.stringList = storageControllerProperty.getRow(rowIndex)
+                            }
+                        }
+                        background.updateColor()
+                    }
+                }
+
+                Connections {
+                    target: tableView
+                    function onDbChanged() {
+                        tableView.focus = true
+                        tableView.selectedRows = []
+                        background.updateColor()
+                    }
+                    function onSelectAllPressed() {
+                        tableView.selectedRows = Array.from({length: tableView.model.rowCount()}, (_, i) => i)
+                        background.updateColor()
+                    }
+                }
+
+                onRowIndexChanged: resetState()
+                onColIndexChanged: resetState()
+
                 Rectangle {
                     id: topLine
                     width: parent.width
@@ -197,7 +337,16 @@ ApplicationWindow {
                 Rectangle {
                     id: background
                     anchors.fill: parent
-                    color: tableView.selectedRow === row ? "#ced3d7" : "white"
+                    color: tableView.selectedRows.includes(row) ? "#ced3d7" : "white"
+                    Connections {
+                        target: tableView
+                        function onSelectionsChanged() {
+                            background.color = tableView.selectedRows.includes(row) ? "#ced3d7" : "white"
+                        }
+                    }
+                    function updateColor() {
+                        background.color = tableView.selectedRows.includes(row) ? "#ced3d7" : "white";
+                    }
                 }
 
                 TextField {
@@ -210,7 +359,7 @@ ApplicationWindow {
                     horizontalAlignment: Text.AlignHCenter
                     readOnly: true
 
-                    property string originalName: storageControllerProperty ? storageControllerProperty.getRow(row)[0] : null
+                    property string originalEmail: storageControllerProperty ? storageControllerProperty.getRow(row)[3] : null
                     property var stringList:  storageControllerProperty ? storageControllerProperty.getRow(row) : null
                     property int columnChanged: 0
                     onTextChanged: {
@@ -272,7 +421,7 @@ ApplicationWindow {
                             }
                         }
                         warningText.text = ""
-                        storageControllerProperty.editRow(originalName, stringList)
+                        storageControllerProperty.editRow(originalEmail, stringList)
                     }
 
                     onEditingFinished: {
@@ -308,15 +457,24 @@ ApplicationWindow {
                     anchors.fill: parent
                     propagateComposedEvents: true
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
-
-                    onClicked: {
-                        if (tableView.deleteMode == true) {
-                            storageControllerProperty.removeRow(tableView.selectedRow, tableView.model.column)
-                        }
-                        if (tableView.selectedRow == row) {
-                            tableView.selectedRow = -1
+                    onClicked: function(mouse) {
+                        if (mouse.modifiers & Qt.ControlModifier) {
+                            let index = tableView.selectedRows.indexOf(row)
+                            if (index !== -1) {
+                                tableView.selectedRows.splice(index, 1)
+                            } else {
+                            tableView.selectedRows.push(row)
+                            }
+                            tableView.selectionsChanged()
                         } else {
-                            tableView.selectedRow = row
+                            let index = tableView.selectedRows.indexOf(row)
+                            if (index !== -1) {
+                                tableView.selectedRows = []
+                            } else {
+                                tableView.selectedRows = []
+                                tableView.selectedRows.push(row)
+                            }
+                            tableView.selectionsChanged()
                         }
                     }
                 }
@@ -334,14 +492,26 @@ ApplicationWindow {
         onRejected: {
             console.log("Canceled")
         }
-        Component.onCompleted: visible = true
+    }
+
+    ChooseDbWindow {
+        id: chooseDbDialog
     }
 
     AddContactWindow {
         id: addContactPopup
     }
-    minimumWidth: tableView.implicitWidth
-    minimumHeight: tableView.implicitHeight
+
+    PasswordWindow {
+        id: passwordPopup
+    }
+
+    LoginWindow {
+        id: loginPopup
+    }
+
+    minimumWidth: mainColumnLayout.implicitWidth+20
+    minimumHeight: mainColumnLayout.implicitHeight
 }
 
 

@@ -14,10 +14,14 @@ QT += sql
 
 SOURCES += \
     main.cpp \
+    mysqlmanager.cpp \
+    sqlitemanager.cpp \
     sqlmanager.cpp \
     storagecontroller.cpp
 
 HEADERS += \
+    mysqlmanager.h \
+    sqlitemanager.h \
     sqlmanager.h \
     storagecontroller.h
 

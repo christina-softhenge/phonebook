@@ -1,16 +1,21 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQml
 
-Popup {
+Dialog {
     id: addContactWindow
     width: 400
     height: 300
-    closePolicy: Popup.CloseOnEscape
+    modal: true
+    closePolicy: Dialog.CloseOnEscape
     property string name: ""
     property string phone: ""
     property string date: ""
     property string email: ""
+
+    property real startX
+    property real startY
 
     onOpened: {
             nameEdit.text = ""
@@ -22,6 +27,18 @@ Popup {
             birthDateEdit.border.color = "black"
             emailEdit.border.color = "black"
             warningText.text = ""
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onPressed: function(event) {
+            addContactWindow.startX = event.x
+            addContactWindow.startY = event.y
+        }
+        onPositionChanged: function(event) {
+            addContactWindow.x += event.x - addContactWindow.startX
+            addContactWindow.y += event.y - addContactWindow.startY
+        }
     }
 
     Rectangle {
@@ -124,8 +141,11 @@ Popup {
                         }
 
                         if (allValid) {
-                            storageControllerProperty.addContact(nameEdit.text, phoneEdit.text, birthDateEdit.text, emailEdit.text)
-                            addContactWindow.close()
+                            if (!storageControllerProperty.addContact(nameEdit.text, phoneEdit.text, birthDateEdit.text, emailEdit.text)) {
+                                warningText.text = "insertion failed!"
+                            } else {
+                                addContactWindow.close()
+                            }
                         }
                     }
                 }
@@ -134,6 +154,44 @@ Popup {
                     implicitHeight: 25
                     text: "cancel"
                     onClicked: addContactWindow.close()
+                }
+
+
+                Button {
+                    id: randomGenerateButton
+                    implicitHeight: 25
+                    text: "random value"
+
+                    function generateRandomName() {
+                        var names = ["Mari", "Sargis", "Mesrop", "David", "Emma", "Serine"];
+                        return names[Math.floor(Math.random() * names.length)];
+                    }
+
+                    function generateRandomPhone() {
+                        var phone = "09";
+                        for (var i = 0; i < 7; i++) {
+                            phone += Math.floor(Math.random() * 10);
+                        }
+                        return phone;
+                    }
+
+                    function generateRandomDate() {
+                        var year = Math.floor(Math.random() * (2005 - 1970 + 1)) + 1970;
+                        var month = ("0" + (Math.floor(Math.random() * 12) + 1)).slice(-2);
+                        var day = ("0" + (Math.floor(Math.random() * 28) + 1)).slice(-2);
+                        return year + "-" + month + "-" + day;
+                    }
+
+                    function generateRandomEmail() {
+                        var domains = ["gmail.com", "yahoo.com", "example.com"];
+                        return nameEdit.text.toLowerCase() + Math.floor(Math.random() * 100) + "@" + domains[Math.floor(Math.random() * domains.length)];
+                    }
+                    onClicked: {
+                        nameEdit.text = generateRandomName();
+                        phoneEdit.text = generateRandomPhone();
+                        birthDateEdit.text = generateRandomDate();
+                        emailEdit.text = generateRandomEmail();
+                    }
                 }
             }
         }

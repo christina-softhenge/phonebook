@@ -4,5 +4,8 @@
         <file>AddContactWindow.qml</file>
         <file>CustomTextEdit.qml</file>
         <file>Main.qml</file>
+        <file>PasswordWindow.qml</file>
+        <file>LoginWindow.qml</file>
+        <file>ChooseDbWindow.qml</file>
     </qresource>
 </RCC>
